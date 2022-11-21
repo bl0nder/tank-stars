@@ -2,59 +2,77 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class TankStars extends ApplicationAdapter {
 	SpriteBatch batch;
-	Texture img;
-	User user;
-	FitViewport view;
-	OrthographicCamera camera;
 
-	static final int windowWidth = 800;
-	static final int windowHeight = 400;
+	//Class Instances
+	Tank dubstepTank;
+	Tank atomicTank;
+	Ground ground;
 
+	//Textures
+	Texture dubstepTexture;
+	Texture atomicTexture;
+	Texture groundTexture;
+	TextureRegion groundRegion;
+
+	//Design
+	private int paddingX = 10;
+	private int paddingY = 50;
+	public static final Color BACKGROUND = new Color(0x1A2969ff);
 	@Override
-	public void create () {
-		int width = Gdx.graphics.getWidth();
-		int height = Gdx.graphics.getHeight();
-
-		float aspectRatio = (float)height/(float)width;
-
-		float viewportWidth = aspectRatio*windowWidth;
-		float viewportHeight = aspectRatio*windowHeight;
-
+	public void create() {
 		batch = new SpriteBatch();
-		img = new Texture("Abrams.png");
-		user = new User(img);
-		camera = new OrthographicCamera();
-		view = new FitViewport(1280, 720, camera);
-		camera.position.set(1280/2, 720/2, 0);
-		view.apply();
-	}
+		dubstepTexture = new Texture("DubstepTank.png");
+		atomicTexture = new Texture("AtomicTank.png");
+		groundTexture = new Texture("ground_purple.png");
+		groundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.ClampToEdge);
+		groundRegion = new TextureRegion(groundTexture,0,0,Gdx.graphics.getWidth(),groundTexture.getHeight());
 
+
+		dubstepTank = new Tank(dubstepTexture);
+		atomicTank = new Tank(atomicTexture);
+		ground = new Ground(groundTexture);
+
+		ground.sprite.setOrigin(0,0);
+		ground.sprite.setScale(0.5f);
+//		groundRegion.setRegion(0,0,1280, 0);
+		ground.sprite.setPosition(0,paddingY-ground.sprite.getHeight()*ground.sprite.getScaleY());
+
+		dubstepTank.sprite.setOrigin(0,0);
+		dubstepTank.sprite.setScale(1);
+		dubstepTank.sprite.setPosition(paddingX,paddingY);
+
+		atomicTank.sprite.setOrigin(0,0);
+		atomicTank.sprite.setScale(-1,1);
+		atomicTank.sprite.setPosition(Gdx.graphics.getWidth()-paddingX,paddingY);
+
+	}
 	@Override
-	public void render () {
-		ScreenUtils.clear(0.3f, 0.2f, 0.8f, 1);
+	public void render() {
+		ScreenUtils.clear(BACKGROUND);
 		batch.begin();
-		user.drawUser(batch);
+		//Draw stuff here
+		dubstepTank.drawTank(batch);
+		atomicTank.drawTank(batch);
+		ground.drawGround(batch);
+//		batch.draw(tank,0,0);
 		batch.end();
 	}
-	
 	@Override
-	public void dispose () {
+	public void dispose() {
 		batch.dispose();
-		img.dispose();
-	}
-
-	@Override
-	public void resize(int width, int height) {
-		view.update(width, height);
-		camera.position.set(width/2, height/2, 0);
+		dubstepTexture.dispose();
+		atomicTexture.dispose();
 	}
 }
