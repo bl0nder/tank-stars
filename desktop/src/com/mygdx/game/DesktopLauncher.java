@@ -10,7 +10,9 @@ public class DesktopLauncher {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setForegroundFPS(60);
 		config.useVsync(true);
+		config.setWindowedMode(1280,720);
 		config.setTitle("Tank Stars");
+		config.setResizable(false);
 		new Lwjgl3Application(new TankStars(), config);
 	}
 }
