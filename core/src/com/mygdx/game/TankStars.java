@@ -5,9 +5,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeType;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -33,6 +36,11 @@ public class TankStars extends ApplicationAdapter {
 	Texture buttonYellowTexture;
 	Texture buttonRedTexture;
 
+	FreeTypeFontGenerator generator;
+	FreeTypeFontGenerator.FreeTypeFontParameter parameter;
+
+	BitmapFont menuText;
+
 	//Design
 	private int paddingX = 10;
 	private int paddingY = 50;
@@ -41,6 +49,10 @@ public class TankStars extends ApplicationAdapter {
 	public void create() {
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera((float) Gdx.graphics.getWidth()/2, (float) Gdx.graphics.getHeight()/2);
+		generator = new FreeTypeFontGenerator(Gdx.files.internal("Arial.ttf"));
+		parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+		parameter.size = 16;
+		menuText = generator.generateFont(parameter);
 
 		//Textures
 		dubstepTexture = new Texture("DubstepTank.png");
@@ -111,6 +123,10 @@ public class TankStars extends ApplicationAdapter {
 		buttonLoadGame.drawButton(batch);
 		buttonMisc.drawButton(batch);
 		buttonExit.drawButton(batch);
+
+		menuText.setColor(Color.WHITE);
+		menuText.draw(batch, "Hello...", 0,0);
+
 //		batch.draw(tank,0,0);
 		batch.end();
 	}
@@ -119,5 +135,6 @@ public class TankStars extends ApplicationAdapter {
 		batch.dispose();
 		dubstepTexture.dispose();
 		atomicTexture.dispose();
+		generator.dispose();
 	}
 }
