@@ -39,6 +39,7 @@ public class MainMenuScreen implements Screen {
 
     //Misc Elements
     MiscUIElement coin;
+    MiscUIElement logo;
 
 
     //Textures
@@ -54,6 +55,7 @@ public class MainMenuScreen implements Screen {
     Texture showTanksTextImage;
     Texture exitTextImage;
     Texture numCoinsTextImage;
+    Texture logoTexture;
 
     FreeTypeFontGenerator generator;
     FreeTypeFontGenerator.FreeTypeFontParameter parameter;
@@ -88,6 +90,7 @@ public class MainMenuScreen implements Screen {
         showTanksTextImage = new Texture ("ShowTanksText.png");
         exitTextImage = new Texture ("ExitText.png");
         numCoinsTextImage = new Texture("NumCoinsText.png");
+        logoTexture = new Texture("Logo.png");
 
 
         dubstepTank = new Tank(dubstepTexture);
@@ -103,7 +106,7 @@ public class MainMenuScreen implements Screen {
         showTanksText = new TextElement(showTanksTextImage);
         exitText = new TextElement(exitTextImage);
         numCoinsText = new TextElement(numCoinsTextImage);
-
+        logo = new MiscUIElement(logoTexture);
 
         ground.sprite.setOrigin(0,0);
         ground.sprite.setScale(1.25f, 1.25f);
@@ -166,7 +169,9 @@ public class MainMenuScreen implements Screen {
         numCoinsText.sprite.setScale(1f);
         numCoinsText.sprite.setPosition((float) Gdx.graphics.getWidth() - (numCoinsText.sprite.getWidth()*numCoinsText.sprite.getScaleX()) - 50, (float) Gdx.graphics.getHeight() - (coin.sprite.getHeight()*coin.sprite.getScaleY()) - 20);
 
-
+        logo.sprite.setOrigin(0,0);
+        logo.sprite.setScale(0.5f);
+        logo.sprite.setPosition(20, (float)Gdx.graphics.getHeight()-(logo.sprite.getHeight()*logo.sprite.getScaleY())-20);
     }
     @Override
     public void render(float delta) {
@@ -184,8 +189,9 @@ public class MainMenuScreen implements Screen {
         loadGameText.drawElement(game.batch);
         showTanksText.drawElement(game.batch);
         exitText.drawElement(game.batch);
-        coin.drawElement(game.batch);
-        numCoinsText.drawElement(game.batch);
+//        coin.drawElement(game.batch);
+//        numCoinsText.drawElement(game.batch);
+        logo.drawElement(game.batch);
 
 //        menuText.setColor(Color.WHITE);
 //        menuText.draw(game.batch, "NEW GAME", Gdx.graphics.getWidth()/2 - 20,Gdx.graphics.getHeight()/2 - 20);
