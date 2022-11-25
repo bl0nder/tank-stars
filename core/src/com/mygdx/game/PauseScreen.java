@@ -8,7 +8,7 @@ import org.w3c.dom.Text;
 
 public class PauseScreen implements Screen {
 
-    public TankStars game;
+    public final TankStars game;
     OrthographicCamera camera;
     public MiscUIElement gameScreenBlurred;
     public MiscUIElement pauseMenuBg;
