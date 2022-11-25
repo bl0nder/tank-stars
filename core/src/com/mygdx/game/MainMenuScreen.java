@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.utils.ScreenUtils;
+import org.w3c.dom.Text;
 
 public class MainMenuScreen implements Screen {
     OrthographicCamera camera;
@@ -29,8 +30,16 @@ public class MainMenuScreen implements Screen {
     Button buttonMisc;
     Button buttonExit;
 
+    //Text Elements
+    TextElement newGameText;
+    TextElement loadGameText;
+    TextElement showTanksText;
+    TextElement exitText;
+    TextElement numCoinsText;
+
     //Misc Elements
     MiscUIElement coin;
+
 
     //Textures
     Texture dubstepTexture;
@@ -40,6 +49,11 @@ public class MainMenuScreen implements Screen {
     Texture buttonYellowTexture;
     Texture buttonRedTexture;
     Texture coinTexture;
+    Texture newGameTextImage;
+    Texture loadGameTextImage;
+    Texture showTanksTextImage;
+    Texture exitTextImage;
+    Texture numCoinsTextImage;
 
     FreeTypeFontGenerator generator;
     FreeTypeFontGenerator.FreeTypeFontParameter parameter;
@@ -69,7 +83,11 @@ public class MainMenuScreen implements Screen {
         buttonRedTexture = new Texture("ExitButton.png");
 //        groundRegion = new TextureRegion(groundTexture);
         coinTexture = new Texture("Coin.png");
-
+        newGameTextImage = new Texture("NewGameText.png");
+        loadGameTextImage = new Texture("LoadGameText.png");
+        showTanksTextImage = new Texture ("ShowTanksText.png");
+        exitTextImage = new Texture ("ExitText.png");
+        numCoinsTextImage = new Texture("NumCoinsText.png");
 
 
         dubstepTank = new Tank(dubstepTexture);
@@ -80,6 +98,11 @@ public class MainMenuScreen implements Screen {
         buttonMisc = new Button (buttonYellowTexture);
         buttonExit = new Button(buttonRedTexture);
         coin = new MiscUIElement(coinTexture);
+        newGameText = new TextElement(newGameTextImage);
+        loadGameText = new TextElement(loadGameTextImage);
+        showTanksText = new TextElement(showTanksTextImage);
+        exitText = new TextElement(exitTextImage);
+        numCoinsText = new TextElement(numCoinsTextImage);
 
 
         ground.sprite.setOrigin(0,0);
@@ -119,10 +142,29 @@ public class MainMenuScreen implements Screen {
         float shiftRedY = (buttonExit.sprite.getScaleY()*buttonExit.sprite.getHeight())/2;
         buttonExit.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - shiftRedX, (float) 2*Gdx.graphics.getHeight()/7 - shiftRedY);
 
+        //Text elements
+        newGameText.sprite.setOrigin(0,0);
+        newGameText.sprite.setScale(1f);
+        newGameText.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - newGameText.sprite.getWidth()/2, (float) 5*Gdx.graphics.getHeight()/7 - newGameText.sprite.getHeight()/2);
+
+        loadGameText.sprite.setOrigin(0,0);
+        loadGameText.sprite.setScale(1f);
+        loadGameText.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - loadGameText.sprite.getWidth()/2, (float) 4*Gdx.graphics.getHeight()/7 - loadGameText.sprite.getHeight()/2);
+
+        showTanksText.sprite.setOrigin(0,0);
+        showTanksText.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - showTanksText.sprite.getWidth()/2, (float) 3*Gdx.graphics.getHeight()/7 - showTanksText.sprite.getHeight()/2);
+
+        exitText.sprite.setOrigin(0,0);
+        exitText.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - exitText.sprite.getWidth()/2, (float) 2*Gdx.graphics.getHeight()/7 - exitText.sprite.getHeight()/2);
+
         //Misc UI elements
         coin.sprite.setOrigin(0,0);
         coin.sprite.setScale(.5f);
-        coin.sprite.setPosition((float) Gdx.graphics.getWidth() - (coin.sprite.getWidth()*coin.sprite.getScaleX()) - 150, (float) Gdx.graphics.getHeight() - (coin.sprite.getHeight()*coin.sprite.getScaleY()) - 25);
+        coin.sprite.setPosition((float) Gdx.graphics.getWidth() - (coin.sprite.getWidth()*coin.sprite.getScaleX()) - 130, (float) Gdx.graphics.getHeight() - (coin.sprite.getHeight()*coin.sprite.getScaleY()) - 25);
+
+        numCoinsText.sprite.setOrigin(0,0);
+        numCoinsText.sprite.setScale(1f);
+        numCoinsText.sprite.setPosition((float) Gdx.graphics.getWidth() - (numCoinsText.sprite.getWidth()*numCoinsText.sprite.getScaleX()) - 50, (float) Gdx.graphics.getHeight() - (coin.sprite.getHeight()*coin.sprite.getScaleY()) - 20);
 
 
     }
@@ -138,7 +180,12 @@ public class MainMenuScreen implements Screen {
         buttonLoadGame.drawButton(game.batch);
         buttonMisc.drawButton(game.batch);
         buttonExit.drawButton(game.batch);
+        newGameText.drawElement(game.batch);
+        loadGameText.drawElement(game.batch);
+        showTanksText.drawElement(game.batch);
+        exitText.drawElement(game.batch);
         coin.drawElement(game.batch);
+        numCoinsText.drawElement(game.batch);
 
 //        menuText.setColor(Color.WHITE);
 //        menuText.draw(game.batch, "NEW GAME", Gdx.graphics.getWidth()/2 - 20,Gdx.graphics.getHeight()/2 - 20);
