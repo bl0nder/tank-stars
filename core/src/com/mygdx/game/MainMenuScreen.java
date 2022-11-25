@@ -40,6 +40,7 @@ public class MainMenuScreen implements Screen {
     //Misc Elements
     MiscUIElement coin;
     MiscUIElement logo;
+    MiscUIElement bg;
 
 
     //Textures
@@ -56,6 +57,7 @@ public class MainMenuScreen implements Screen {
     Texture exitTextImage;
     Texture numCoinsTextImage;
     Texture logoTexture;
+    Texture bgTexture;
 
     FreeTypeFontGenerator generator;
     FreeTypeFontGenerator.FreeTypeFontParameter parameter;
@@ -79,7 +81,7 @@ public class MainMenuScreen implements Screen {
         //Textures
         dubstepTexture = new Texture("DubstepTank.png");
         atomicTexture = new Texture("AtomicTank.png");
-        groundTexture = new Texture("ground_purple.png");
+        groundTexture = new Texture("ground_red.png");
         groundTexture.setWrap(Texture.TextureWrap.MirroredRepeat, Texture.TextureWrap.MirroredRepeat);
         buttonYellowTexture = new Texture("MainMenuButton.png");
         buttonRedTexture = new Texture("ExitButton.png");
@@ -91,6 +93,7 @@ public class MainMenuScreen implements Screen {
         exitTextImage = new Texture ("ExitText.png");
         numCoinsTextImage = new Texture("NumCoinsText.png");
         logoTexture = new Texture("Logo.png");
+        bgTexture = new Texture ("MainMenuBg.png");
 
 
         dubstepTank = new Tank(dubstepTexture);
@@ -107,6 +110,10 @@ public class MainMenuScreen implements Screen {
         exitText = new TextElement(exitTextImage);
         numCoinsText = new TextElement(numCoinsTextImage);
         logo = new MiscUIElement(logoTexture);
+        bg = new MiscUIElement(bgTexture);
+
+        bg.sprite.setOrigin(0,0);
+        bg.sprite.setScale(0.8f);
 
         ground.sprite.setOrigin(0,0);
         ground.sprite.setScale(1.25f, 1.25f);
@@ -128,12 +135,12 @@ public class MainMenuScreen implements Screen {
         buttonNewGame.sprite.setScale(0.5f);
         float shiftX = (buttonNewGame.sprite.getScaleX()*buttonNewGame.sprite.getWidth())/2;
         float shiftY = (buttonNewGame.sprite.getScaleY()*buttonNewGame.sprite.getHeight())/2;
-        buttonNewGame.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - shiftX, (float) 5*Gdx.graphics.getHeight()/7 - shiftY);
+        buttonNewGame.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - shiftX, (float) 4*Gdx.graphics.getHeight()/7 - shiftY);
 
 
         buttonLoadGame.sprite.setOrigin(0,0);
         buttonLoadGame.sprite.setScale(0.5f);
-        buttonLoadGame.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - shiftX, (float) 4*Gdx.graphics.getHeight()/7 - shiftY);
+        buttonLoadGame.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - shiftX, (float) 3*Gdx.graphics.getHeight()/7 - shiftY);
 
         buttonMisc.sprite.setOrigin(0,0);
         buttonMisc.sprite.setScale(0.5f);
@@ -148,11 +155,11 @@ public class MainMenuScreen implements Screen {
         //Text elements
         newGameText.sprite.setOrigin(0,0);
         newGameText.sprite.setScale(1f);
-        newGameText.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - newGameText.sprite.getWidth()/2, (float) 5*Gdx.graphics.getHeight()/7 - newGameText.sprite.getHeight()/2);
+        newGameText.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - newGameText.sprite.getWidth()/2, (float) 4*Gdx.graphics.getHeight()/7 - newGameText.sprite.getHeight()/2);
 
         loadGameText.sprite.setOrigin(0,0);
         loadGameText.sprite.setScale(1f);
-        loadGameText.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - loadGameText.sprite.getWidth()/2, (float) 4*Gdx.graphics.getHeight()/7 - loadGameText.sprite.getHeight()/2);
+        loadGameText.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - loadGameText.sprite.getWidth()/2, (float) 3*Gdx.graphics.getHeight()/7 - loadGameText.sprite.getHeight()/2);
 
         showTanksText.sprite.setOrigin(0,0);
         showTanksText.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - showTanksText.sprite.getWidth()/2, (float) 3*Gdx.graphics.getHeight()/7 - showTanksText.sprite.getHeight()/2);
@@ -171,23 +178,24 @@ public class MainMenuScreen implements Screen {
 
         logo.sprite.setOrigin(0,0);
         logo.sprite.setScale(0.5f);
-        logo.sprite.setPosition(20, (float)Gdx.graphics.getHeight()-(logo.sprite.getHeight()*logo.sprite.getScaleY())-20);
+        logo.sprite.setPosition((float) Gdx.graphics.getWidth()/2-(logo.sprite.getWidth()*logo.sprite.getScaleX())/2, (float)Gdx.graphics.getHeight()-(logo.sprite.getHeight()*logo.sprite.getScaleY())-40);
     }
     @Override
     public void render(float delta) {
         ScreenUtils.clear(BACKGROUND);
         game.batch.begin();
         //Draw stuff here
+        bg.drawElement(game.batch);
         dubstepTank.drawTank(game.batch);
         atomicTank.drawTank(game.batch);
         ground.drawGround(game.batch);
         buttonNewGame.drawButton(game.batch);
         buttonLoadGame.drawButton(game.batch);
-        buttonMisc.drawButton(game.batch);
+//        buttonMisc.drawButton(game.batch);
         buttonExit.drawButton(game.batch);
         newGameText.drawElement(game.batch);
         loadGameText.drawElement(game.batch);
-        showTanksText.drawElement(game.batch);
+//        showTanksText.drawElement(game.batch);
         exitText.drawElement(game.batch);
 //        coin.drawElement(game.batch);
 //        numCoinsText.drawElement(game.batch);

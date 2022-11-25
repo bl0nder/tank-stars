@@ -15,10 +15,21 @@ public class PauseScreen implements Screen {
     public Button resumeButton;
     public Button saveButton;
     public Button exitToMenuButton;
+    public Button settingsButton;
+
+    public TextElement resumeGameText;
+    public TextElement saveGameText;
+    public TextElement exitToMenuText;
+    public TextElement settingsText;
+
     public Texture gameScreenBlurredTexture;
     public Texture buttonYellowTexture;
     public Texture buttonRedTexture;
     public Texture pauseMenuBgTexture;
+    public Texture resumeGameTextImage;
+    public Texture saveGameTextImage;
+    public Texture exitToMenuTextImage;
+    public Texture settingsTextImage;
 
     public PauseScreen(TankStars game) {
         this.game = game;
@@ -28,27 +39,54 @@ public class PauseScreen implements Screen {
         pauseMenuBgTexture = new Texture("PauseMenuBg.png");
         buttonYellowTexture = new Texture("MainMenuButton.png");
         buttonRedTexture = new Texture("ExitButton.png");
+        resumeGameTextImage = new Texture("ResumeGameText.png");
+        saveGameTextImage = new Texture("SaveGameText.png");
+        exitToMenuTextImage = new Texture("ExitText.png");
 
         gameScreenBlurred = new MiscUIElement(gameScreenBlurredTexture);
         pauseMenuBg = new MiscUIElement(pauseMenuBgTexture);
         resumeButton = new Button(buttonYellowTexture);
         saveButton = new Button(buttonYellowTexture);
         exitToMenuButton = new Button(buttonRedTexture);
+        resumeGameText = new TextElement(resumeGameTextImage);
+        saveGameText = new TextElement(saveGameTextImage);
+        exitToMenuText = new TextElement(exitToMenuTextImage);
+        settingsButton = new Button(buttonYellowTexture);
+        settingsTextImage = new Texture("Settings.png");
+        settingsText = new TextElement(settingsTextImage);
+
+        gameScreenBlurred.sprite.setScale(1.01f);
 
         pauseMenuBg.sprite.setOrigin(0,0);
         pauseMenuBg.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - pauseMenuBg.sprite.getWidth()/2 - 10, (float) Gdx.graphics.getHeight()/2 - pauseMenuBg.sprite.getHeight()/2 - 10);
 
         resumeButton.sprite.setOrigin(0,0);
         resumeButton.sprite.setScale(0.5f);
-        resumeButton.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - (resumeButton.sprite.getWidth()*resumeButton.sprite.getScaleX())/2, (float) Gdx.graphics.getHeight()/2 - (resumeButton.sprite.getHeight() * resumeButton.sprite.getScaleY())/2);
+        resumeButton.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - (resumeButton.sprite.getWidth()*resumeButton.sprite.getScaleX())/2, (float) Gdx.graphics.getHeight()/2 + 110);
 
         saveButton.sprite.setOrigin(0,0);
         saveButton.sprite.setScale(0.5f);
-        saveButton.sprite.setPosition((float) Gdx.graphics.getWidth()/2, (float) Gdx.graphics.getHeight()/2);
+        saveButton.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - (saveButton.sprite.getWidth()*saveButton.sprite.getScaleX())/2, (float) Gdx.graphics.getHeight()/2 - (saveButton.sprite.getHeight() * saveButton.sprite.getScaleY())/2 + 40);
+
+        settingsButton.sprite.setOrigin(0,0);
+        settingsButton.sprite.setScale(0.5f);
+        settingsButton.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - (settingsButton.sprite.getWidth()*settingsButton.sprite.getScaleX())/2, (float) Gdx.graphics.getHeight()/2 - (settingsButton.sprite.getHeight() * settingsButton.sprite.getScaleY())/2 - 75);
 
         exitToMenuButton.sprite.setOrigin(0,0);
         exitToMenuButton.sprite.setScale(0.5f);
-        exitToMenuButton.sprite.setPosition((float) Gdx.graphics.getWidth()/2, (float) Gdx.graphics.getHeight()/2);
+        exitToMenuButton.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - (exitToMenuButton.sprite.getWidth()*exitToMenuButton.sprite.getScaleX())/2, (float) Gdx.graphics.getHeight()/2 - (pauseMenuBg.sprite.getHeight()*pauseMenuBg.sprite.getScaleY()/3) -40 );
+
+        resumeGameText.sprite.setOrigin(0,0);
+        resumeGameText.sprite.setPosition((float) Gdx.graphics.getWidth()/2 - resumeGameText.sprite.getWidth()/2, (float) Gdx.graphics.getHeight()/2 + (resumeButton.sprite.getHeight() * resumeButton.sprite.getScaleY()/2)+ 98);
+
+        saveGameText.sprite.setOrigin(0,0);
+        saveGameText.sprite.setPosition((float) Gdx.graphics.getWidth()/2- saveGameText.sprite.getWidth()/2, (float) Gdx.graphics.getHeight()/2+30);
+
+        settingsText.sprite.setOrigin(0,0);
+        settingsText.sprite.setPosition((float) Gdx.graphics.getWidth()/2- settingsText.sprite.getWidth()/2, (float) Gdx.graphics.getHeight()/2-90);
+
+        exitToMenuText.sprite.setOrigin(0,0);
+        exitToMenuText.sprite.setPosition((float) Gdx.graphics.getWidth()/2- exitToMenuText.sprite.getWidth()/2, (float) Gdx.graphics.getHeight()/2 - 222);
     }
     @Override
     public void show() {
@@ -64,6 +102,11 @@ public class PauseScreen implements Screen {
         resumeButton.drawButton(game.batch);
         saveButton.drawButton(game.batch);
         exitToMenuButton.drawButton(game.batch);
+        resumeGameText.drawElement(game.batch);
+        saveGameText.drawElement(game.batch);
+        exitToMenuText.drawElement(game.batch);
+        settingsButton.drawButton(game.batch);
+        settingsText.drawElement(game.batch);
         game.batch.end();
     }
 
@@ -89,6 +132,12 @@ public class PauseScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        gameScreenBlurredTexture.dispose();
+        pauseMenuBgTexture.dispose();
+        buttonRedTexture.dispose();
+        exitToMenuTextImage.dispose();
+        saveGameTextImage.dispose();
+        resumeGameTextImage.dispose();
+        buttonYellowTexture.dispose();
     }
 }
