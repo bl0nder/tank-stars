@@ -33,7 +33,10 @@ public class SelectionScreen implements Screen {
     Texture boxImage1;
     Texture boxImage2;
     Texture boxImage3;
+    Texture boxImage;
     Texture selectButtonImage;
+    Texture heading2Image;
+    Texture playImage;
 
     Sprite bg;
     Sprite tank1;
@@ -46,10 +49,16 @@ public class SelectionScreen implements Screen {
     Sprite box1;
     Sprite box2;
     Sprite box3;
+    Sprite box;
     Sprite selectButton;
+    Sprite heading2;
+    Sprite playButton;
 
     OrthographicCamera camera;
     Viewport viewport;
+    Vector3 touchPoint = new Vector3();
+    boolean b1 = false, b2 = false, b3 = false, h1 = true, h2 = false;
+    int s1 = 0, s2 = 0;
     public final int screenWidth = 1280;
     public final int screenHeight = 720;
     public SelectionScreen(final TankStars game) {
@@ -70,10 +79,18 @@ public class SelectionScreen implements Screen {
         boxImage2 = new Texture("bg-boxd.png");
         boxImage3 = new Texture("bg-boxs.png");
         selectButtonImage = new Texture("yellow-btn.png");
+        boxImage = new Texture("bgbox.png");
+        heading2Image = new Texture("select-heading-2.png");
+        playImage = new Texture("play.png");
 
         bg = new Sprite(bgImage);
         bg.setOrigin(0, 0);
         bg.setPosition(0, 0);
+
+        playButton = new Sprite(playImage);
+        playButton.setOrigin(0, 0);
+        playButton.setScale(0.25f);
+        playButton.setPosition((float) 9*screenWidth/10,600);
 
         tank1 = new Sprite(tank1Image);
         tank1.setOrigin(0, 0);
@@ -92,6 +109,10 @@ public class SelectionScreen implements Screen {
         heading.setOrigin(0, 0);
         heading.setScale(0.5f);
         heading.setPosition((float) screenWidth/2 - (float) (690*0.5)/2, 600);
+        heading2 = new Sprite(heading2Image);
+        heading2.setOrigin(0, 0);
+        heading2.setScale(0.5f);
+        heading2.setPosition(heading.getX(), heading.getY());
 
         desc1 = new Sprite(descImage1);
         desc1.setOrigin(0, 0);
@@ -118,11 +139,67 @@ public class SelectionScreen implements Screen {
         box3.setOrigin(0, 0);
         box3.setScale(0.9f, 0.75f);
         box3.setPosition(80 + 400 + 400, 160);
+        box = new Sprite(boxImage);
+        box.setOrigin(0, 0);
+        box.setScale(0.75f);
 
         selectButton = new Sprite(selectButtonImage);
         selectButton.setOrigin(0, 0);
         selectButton.setScale(0.5f);
         selectButton.setPosition((float) screenWidth/2 - (float) (720/2)/2, 50);
+    }
+
+    void update() {
+        if(Gdx.input.justTouched()) {
+            //unprojects the camera
+            camera.unproject(touchPoint.set(Gdx.input.getX(),Gdx.input.getY(),0));
+            if(box1.getBoundingRectangle().contains(touchPoint.x,touchPoint.y)) {
+                b1 = true;
+                b2 = false;
+                b3 = false;
+            }
+            if (box2.getBoundingRectangle().contains(touchPoint.x,touchPoint.y)) {
+                b1 = false;
+                b2 = true;
+                b3 = false;
+            }
+            if (box3.getBoundingRectangle().contains(touchPoint.x, touchPoint.y)) {
+                b1 = false;
+                b2 = false;
+                b3 = true;
+            }
+            if (h1 && heading.getBoundingRectangle().contains(touchPoint.x, touchPoint.y)) {
+                h1 = false;
+                h2 = true;
+                b1 = false;
+                b2 = false;
+                b3 = false;
+            }
+            else if (h2 && heading2.getBoundingRectangle().contains(touchPoint.x, touchPoint.y)) {
+                h1 = true;
+                h2 = false;
+                b1 = false;
+                b2 = false;
+                b3 = false;
+            }
+            if ((b1||b2||b3) && selectButton.getBoundingRectangle().contains(touchPoint.x, touchPoint.y)) {
+                if (h1) {
+                    if (b1) s1 = 1;
+                    if (b2) s1 = 2;
+                    if (b3) s1 = 3;
+                }
+                else if (h2) {
+                    if (b1) s2 = 1;
+                    if (b2) s2 = 2;
+                    if (b3) s2 = 3;
+                }
+            }
+            if (playButton.getBoundingRectangle().contains(touchPoint.x, touchPoint.y)) {
+                GameScreen newScreen = new GameScreen(game);
+                game.gameScreen = newScreen;
+                game.setScreen(game.gameScreen);
+            }
+        }
     }
 
     public void render(float delta) {
@@ -136,15 +213,31 @@ public class SelectionScreen implements Screen {
         box1.draw(game.batch);
         box2.draw(game.batch);
         box3.draw(game.batch);
+        if (b1 || b2 || b3) box.draw(game.batch);
         tank1.draw(game.batch);
         tank2.draw(game.batch);
         tank3.draw(game.batch);
-        heading.draw(game.batch);
+        if (h1 && !h2) heading.draw(game.batch);
+        if (h2 && !h1) heading2.draw(game.batch);
+        if (s1>0 &&s2>0) playButton.draw(game.batch);
         desc1.draw(game.batch);
         desc2.draw(game.batch);
         desc3.draw(game.batch);
         selectButton.draw(game.batch);
         game.batch.end();
+        update();
+        if (b1) {
+            box.setScale(0.75f);
+            box.setPosition(box1.getX(), box1.getY());
+        }
+        if (b2) {
+            box.setScale(0.75f);
+            box.setPosition(box2.getX(), box2.getY());
+        }
+        if (b3) {
+            box.setScale(0.9f, 0.75f);
+            box.setPosition(box3.getX(), box3.getY());
+        }
     }
 
     public void resize(int width, int height) {

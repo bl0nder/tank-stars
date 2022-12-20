@@ -10,8 +10,11 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import org.w3c.dom.Text;
+
+import static java.lang.System.exit;
 
 public class MainMenuScreen implements Screen {
     OrthographicCamera camera;
@@ -68,10 +71,14 @@ public class MainMenuScreen implements Screen {
     private int paddingX = 10;
     private int paddingY = 50;
     public static final Color BACKGROUND = new Color(0x1A2969ff);
+    Vector3 touchPoint = new Vector3();
+
 
     public MainMenuScreen(final TankStars game) {
         this.game = game;
-        this.camera = new OrthographicCamera((float) Gdx.graphics.getWidth()/2, (float) Gdx.graphics.getHeight()/2);
+        camera = new OrthographicCamera();
+//        viewport = new FitViewport(1280, 720, camera);
+        camera.setToOrtho(false, 1280, 720);
 
         generator = new FreeTypeFontGenerator(Gdx.files.internal("Arial.ttf"));
         parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -183,6 +190,8 @@ public class MainMenuScreen implements Screen {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(BACKGROUND);
+        update();
+        camera.update();
         game.batch.begin();
         //Draw stuff here
         bg.drawElement(game.batch);
@@ -207,6 +216,29 @@ public class MainMenuScreen implements Screen {
 //		batch.draw(tank,0,0);
         game.batch.end();
     }
+
+    void update() {
+        if(Gdx.input.justTouched()) {
+            //unprojects the camera
+            camera.unproject(touchPoint.set(Gdx.input.getX(),Gdx.input.getY(),0));
+            if(buttonNewGame.sprite.getBoundingRectangle().contains(touchPoint.x,touchPoint.y)) {
+                SelectionScreen newScreen = new SelectionScreen(game);
+                game.selectionScreen = newScreen;
+                game.setScreen(game.selectionScreen);
+            }
+            if (buttonLoadGame.sprite.getBoundingRectangle().contains(touchPoint.x,touchPoint.y)) {
+                if (game.gameScreen == null) {
+                    GameScreen newScreen = new GameScreen(game);
+                    game.gameScreen = newScreen;
+                }
+                game.setScreen(game.gameScreen);
+            }
+            if (buttonExit.sprite.getBoundingRectangle().contains(touchPoint.x,touchPoint.y)) {
+                exit(0);
+            }
+        }
+    }
+
     @Override
     public void dispose() {
         game.batch.dispose();

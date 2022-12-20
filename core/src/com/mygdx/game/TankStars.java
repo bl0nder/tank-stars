@@ -19,13 +19,19 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 public class TankStars extends Game {
 
 	public SpriteBatch batch;
-	public BitmapFont font;
+	public PauseScreen pauseScreen;
+	public GameScreen gameScreen;
+	public SelectionScreen selectionScreen;
+	public MainMenuScreen mainMenuScreen;
 
 	@Override
 	public void create() {
 		batch = new SpriteBatch();
-		font = new BitmapFont();
 		this.setScreen(new MainMenuScreen (this));
+		this.pauseScreen = new PauseScreen(this);
+		this.gameScreen = new GameScreen(this);
+		this.mainMenuScreen = new MainMenuScreen(this);
+		this.selectionScreen = new SelectionScreen(this);
 	}
 	@Override
 	public void render() {
@@ -34,6 +40,5 @@ public class TankStars extends Game {
 	@Override
 	public void dispose() {
 		batch.dispose();
-		font.dispose();
 	}
 }

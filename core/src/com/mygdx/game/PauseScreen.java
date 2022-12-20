@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector3;
 import org.w3c.dom.Text;
 
 public class PauseScreen implements Screen {
@@ -30,11 +31,14 @@ public class PauseScreen implements Screen {
     public Texture saveGameTextImage;
     public Texture exitToMenuTextImage;
     public Texture settingsTextImage;
+    Vector3 touchPoint = new Vector3();
 
     public PauseScreen(TankStars game) {
         this.game = game;
-        camera = new OrthographicCamera((float) Gdx.graphics.getWidth()/2, (float) Gdx.graphics.getHeight()/2);
-
+//        camera = new OrthographicCamera((float) Gdx.graphics.getWidth()/2, (float) Gdx.graphics.getHeight()/2);
+        camera = new OrthographicCamera();
+//        viewport = new FitViewport(1280, 720, camera);
+        camera.setToOrtho(false, 1280, 720);
         gameScreenBlurredTexture = new Texture("GameScreenBgBlurred.png");
         pauseMenuBgTexture = new Texture("PauseMenuBg.png");
         buttonYellowTexture = new Texture("MainMenuButton.png");
@@ -88,6 +92,20 @@ public class PauseScreen implements Screen {
         exitToMenuText.sprite.setOrigin(0,0);
         exitToMenuText.sprite.setPosition((float) Gdx.graphics.getWidth()/2- exitToMenuText.sprite.getWidth()/2, (float) Gdx.graphics.getHeight()/2 - 222);
     }
+
+    void update() {
+        if(Gdx.input.justTouched()) {
+            //unprojects the camera
+            camera.unproject(touchPoint.set(Gdx.input.getX(),Gdx.input.getY(),0));
+            if(resumeButton.sprite.getBoundingRectangle().contains(touchPoint.x,touchPoint.y)) {
+                game.setScreen(game.gameScreen);
+            }
+            if (exitToMenuButton.sprite.getBoundingRectangle().contains(touchPoint.x,touchPoint.y)) {
+                game.setScreen(game.mainMenuScreen);
+            }
+        }
+    }
+
     @Override
     public void show() {
 
@@ -95,6 +113,8 @@ public class PauseScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        update();
+        camera.update();
         game.batch.begin();
         //Draw stuff here
         gameScreenBlurred.drawElement(game.batch);

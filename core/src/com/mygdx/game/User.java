@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class User {
     public Sprite sprite;
+    public Tank selectedTank;
 
     public User(Texture t) {
         sprite = new Sprite(t);

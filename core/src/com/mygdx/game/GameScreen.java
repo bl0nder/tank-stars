@@ -1,5 +1,9 @@
 package com.mygdx.game;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.*;
 
 import com.badlogic.gdx.Gdx;
@@ -10,17 +14,19 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.physics.box2d.*;
 
-public class GameScreen implements Screen {
+import static java.lang.System.exit;
+
+public class GameScreen implements Screen, Serializable {
     final TankStars game;
+    final int uniqueID = 1;
 
     Texture tankImage1;
     Texture tankImage2;
@@ -37,6 +43,8 @@ public class GameScreen implements Screen {
     Texture dotsImage;
     Texture shooterImage;
     Texture fuelImage;
+    Texture hpImage1;
+    Texture hpImage2;
 
     Sprite bg;
     Sprite tank1;
@@ -55,12 +63,21 @@ public class GameScreen implements Screen {
     Sprite pauseButton;
     Sprite shooter;
     Sprite fuel;
+    Sprite hp1;
+    Sprite hp2;
     OrthographicCamera camera;
     Viewport viewport;
+    World world;
+    Projectile projectile;
+    Box2DDebugRenderer box2DDebugRenderer;
+    Matrix4 debugMatrix;
+    Vector3 touchPoint = new Vector3();
+
     public final int screenWidth = 1280;
     public final int screenHeight = 720;
     public GameScreen(final TankStars game) {
         this.game = game;
+        world = new World(new Vector2(0, -9.8f), true);
 
         camera = new OrthographicCamera();
 //        viewport = new FitViewport(1280, 720, camera);
@@ -81,13 +98,15 @@ public class GameScreen implements Screen {
         dotsImage = new Texture(Gdx.files.internal("dots.png"));
         shooterImage = new Texture(Gdx.files.internal("shooter.png"));
         fuelImage = new Texture("fuel.png");
+        hpImage1 = new Texture("hp-1.png");
+        hpImage2 = new Texture("hp-2.png");
 
         bg = new Sprite(bgImage);
         bg.setOrigin(0, 0);
         bg.setPosition(0, 0);
 
         tank1 = new Sprite(tankImage1);
-        bg.setOrigin(0, 0);
+        tank1.setOrigin(0, 0);
         tank1.setPosition(100, 200);
         shooter = new Sprite(shooterImage);
         shooter.setOrigin(0, 0);
@@ -100,12 +119,18 @@ public class GameScreen implements Screen {
         dots.setPosition(100 + 55, 200 + 15 + 40);
 
         tank2 = new Sprite(tankImage2);
-        bg.setOrigin(0, 0);
+        tank2.setOrigin(0, 0);
         tank2.setPosition(screenWidth - 200 - 55, 235);
 
         hpBar = new Sprite(hpBarImage);
-        bg.setOrigin(0, 0);
-        hpBar.setPosition((float) screenWidth/2 - (float) 880/2, screenHeight - 100);
+        hpBar.setOrigin(0, 0);
+        hpBar.setPosition((float) screenWidth/2 - hpBar.getWidth()/2, screenHeight - 100);
+        hp1 = new Sprite(hpImage1);
+        hp1.setOrigin(0, 0);
+        hp1.setPosition((float) screenWidth/2 - (float) (880)/2, screenHeight - 100);
+        hp2 = new Sprite(hpImage2);
+        hp2.setOrigin(0, 0);
+        hp2.setPosition((float) 2*hpBar.getX() - hp1.getX() - hp1.getWidth() + hpBar.getWidth(), screenHeight - 100);
 
         terrain = new Sprite(terrainImage);
         bg.setOrigin(0, 0);
@@ -154,13 +179,21 @@ public class GameScreen implements Screen {
         fuel.setOrigin(0, 0);
         fuel.setScale(0.5f);
         fuel.setPosition(100, 180);
+
+        projectile = new Projectile("projectile.png", 100 + 55, 200 + 15 + 40, 1f, world, 0.5f, 0.5f, 45f, 100);
+        box2DDebugRenderer = new Box2DDebugRenderer();
     }
 
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0.2f, 1);
 
+        update();
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
+        projectile.projectileSprite.setPosition(projectile.projectileBody.getPosition().x, projectile.projectileBody.getPosition().y);
+        projectile.projectileSprite.setRotation((float)Math.atan(projectile.projectileBody.getLinearVelocity().y/projectile.projectileBody.getLinearVelocity().x) * 180/(float)Math.PI);
+        world.step(1/60f, 6, 2);
+//        debugMatrix = game.batch.getProjectionMatrix().cpy().scale(100f, 100f, 0);
 
         game.batch.begin();
         bg.draw(game.batch);
@@ -175,12 +208,30 @@ public class GameScreen implements Screen {
         terrain.draw(game.batch);
         tank1.draw(game.batch);
         shooter.draw(game.batch);
-        dots.draw(game.batch);
+        projectile.projectileSprite.draw(game.batch);
         fuel.draw(game.batch);
         tank2.draw(game.batch);
         hpBar.draw(game.batch);
+        hp1.draw(game.batch);
+        hp2.draw(game.batch);
         pauseButton.draw(game.batch);
         game.batch.end();
+
+//        box2DDebugRenderer.render(world, debugMatrix);
+    }
+
+    void update() {
+        if(Gdx.input.justTouched()) {
+            //unprojects the camera
+            camera.unproject(touchPoint.set(Gdx.input.getX(),Gdx.input.getY(),0));
+            if(pauseButton.getBoundingRectangle().contains(touchPoint.x,touchPoint.y)) {
+                if (game.pauseScreen == null) {
+                    PauseScreen newScreen = new PauseScreen(game);
+                    game.pauseScreen = newScreen;
+                }
+                game.setScreen(game.pauseScreen);
+            }
+        }
     }
 
     public void resize(int width, int height) {
