@@ -11,8 +11,6 @@ public class DesktopLauncher {
 	private final static int worldHeight = 720;
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setForegroundFPS(60);
-		config.useVsync(true);
 		config.setWindowedMode(worldWidth,worldHeight);
 		config.setTitle("Tank Stars");
 		config.setResizable(false);

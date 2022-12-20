@@ -24,6 +24,8 @@ import com.badlogic.gdx.physics.box2d.*;
 public class Projectile {
     Sprite projectileSprite;
     Body projectileBody;
+    int damageRadius = 100;
+    float maxDamage = (float) 1000/3 + 1;
 
     public Projectile(String path, float x, float y, float scale, World world, float density, float restitution, float turretAngle, int power) {
         Texture projectileImage = new Texture(path);
@@ -54,5 +56,21 @@ public class Projectile {
         this.projectileBody = body;
 
         shape.dispose();
+    }
+
+    public int getDamageRadius() {
+        return 200;
+    }
+
+    public float calculateDamage(boolean contact, float distance) {
+        if (distance >= damageRadius) return 0f;
+        else {
+            if (contact) {
+                return (float) maxDamage;
+            }
+            else {
+                return maxDamage - (maxDamage/damageRadius)*distance;
+            }
+        }
     }
 }
