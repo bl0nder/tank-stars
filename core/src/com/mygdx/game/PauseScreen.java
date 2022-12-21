@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector3;
 import org.w3c.dom.Text;
 
+import java.io.IOException;
+
 public class PauseScreen implements Screen {
 
     public final TankStars game;
@@ -23,15 +25,15 @@ public class PauseScreen implements Screen {
     public TextElement exitToMenuText;
     public TextElement settingsText;
 
-    public Texture gameScreenBlurredTexture;
-    public Texture buttonYellowTexture;
-    public Texture buttonRedTexture;
-    public Texture pauseMenuBgTexture;
-    public Texture resumeGameTextImage;
-    public Texture saveGameTextImage;
-    public Texture exitToMenuTextImage;
-    public Texture settingsTextImage;
-    Vector3 touchPoint = new Vector3();
+    public transient Texture gameScreenBlurredTexture;
+    public transient Texture buttonYellowTexture;
+    public transient Texture buttonRedTexture;
+    public transient Texture pauseMenuBgTexture;
+    public transient Texture resumeGameTextImage;
+    public transient Texture saveGameTextImage;
+    public transient Texture exitToMenuTextImage;
+    public transient Texture settingsTextImage;
+    transient Vector3 touchPoint = new Vector3();
 
     public PauseScreen(TankStars game) {
         this.game = game;
@@ -93,13 +95,21 @@ public class PauseScreen implements Screen {
         exitToMenuText.sprite.setPosition((float) Gdx.graphics.getWidth()/2- exitToMenuText.sprite.getWidth()/2, (float) Gdx.graphics.getHeight()/2 - 222);
     }
 
-    void update() {
+    void update() throws IOException {
         if(Gdx.input.justTouched()) {
             //unprojects the camera
             camera.unproject(touchPoint.set(Gdx.input.getX(),Gdx.input.getY(),0));
             if(resumeButton.sprite.getBoundingRectangle().contains(touchPoint.x,touchPoint.y)) {
                 game.setScreen(game.gameScreen);
             }
+
+            if(saveButton.sprite.getBoundingRectangle().contains(touchPoint.x,touchPoint.y)) {
+                if (TankStars.numSavedGames < 3) {
+                    TankStars.numSavedGames += 1;
+                }
+                game.gameScreen.serialize();
+            }
+
             if (exitToMenuButton.sprite.getBoundingRectangle().contains(touchPoint.x,touchPoint.y)) {
                 game.setScreen(game.mainMenuScreen);
             }
@@ -112,8 +122,14 @@ public class PauseScreen implements Screen {
     }
 
     @Override
-    public void render(float delta) {
-        update();
+    public void render(float delta){
+        try {
+            update();
+        }
+        catch (IOException ex) {
+            ex.printStackTrace();
+            ex.getMessage();
+        }
         camera.update();
         game.batch.begin();
         //Draw stuff here

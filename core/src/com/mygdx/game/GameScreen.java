@@ -18,9 +18,10 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.io.*;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 public class GameScreen implements Screen, Serializable {
-    final TankStars game;
+    final transient TankStars game;
     final static float PPM = 100f;
     public final int screenWidth = 1280;
     public final int screenHeight = 720;
@@ -29,88 +30,106 @@ public class GameScreen implements Screen, Serializable {
     //Aditya hello
     final int uniqueID = 1;
 
-    Texture tankImage1;
-    Texture tankImage2;
-    Texture terrainImage;
-    Texture hpBarImage;
-    Texture bgImage;
-    Texture pauseButtonImage;
-    Texture tree1Image;
-    Texture tree2Image;
-    Texture tree3Image;
-    Texture tree4Image;
-    Texture tower1Image;
-    Texture tower2Image;
-    Texture dotsImage;
-    Texture shooterImage;
-    Texture fuelImage;
-    Texture hpImage1;
-    Texture hpImage2;
-    Texture powerTexture;
+    public int s1;
+    public int s2;
 
-    Sprite bg;
-    Sprite power1Sprite;
-    Sprite power2Sprite;
-    Sprite tank1;
-    Sprite tank2;
-    Sprite terrain;
-    Sprite tree11;
-    Sprite tree12;
-    Sprite tree21;
-    Sprite tree22;
-    Sprite tree3;
-    Sprite tree4;
-    Sprite dots;
-    Sprite tower2;
-    Sprite tower1;
-    Sprite hpBar;
-    Sprite pauseButton;
-    Sprite shooter;
-    Sprite fuel;
-    Sprite hp1;
-    Sprite hp2;
+    transient Texture tankImage1;
+    transient Texture tankImage2;
+    transient Texture terrainImage;
+    transient Texture hpBarImage;
+    transient Texture bgImage;
+    transient Texture pauseButtonImage;
+    transient Texture tree1Image;
+    transient Texture tree2Image;
+    transient Texture tree3Image;
+    transient Texture tree4Image;
+    transient Texture tower1Image;
+    transient Texture tower2Image;
+    transient Texture dotsImage;
+    transient Texture shooterImage;
+    transient Texture fuelImage;
+    transient Texture hpImage1;
+    transient Texture hpImage2;
+    transient Texture powerTexture;
 
-    Projectile projectile;
-    Vector3 touchPoint = new Vector3();
+    transient Sprite bg;
+    transient Sprite power1Sprite;
+    transient Sprite power2Sprite;
+    transient Sprite tank1;
+    transient Sprite tank2;
+    transient Sprite terrain;
+    transient Sprite tree11;
+    transient Sprite tree12;
+    transient Sprite tree21;
+    transient Sprite tree22;
+    transient Sprite tree3;
+    transient Sprite tree4;
+    transient Sprite dots;
+    transient Sprite tower2;
+    transient Sprite tower1;
+    transient Sprite hpBar;
+    transient Sprite pauseButton;
+    transient Sprite shooter;
+    transient Sprite fuel;
+    transient Sprite hp1;
+    transient Sprite hp2;
+
+    transient Projectile projectile;
+    transient Vector3 touchPoint = new Vector3();
 
 
-    private World world;
-    private Box2DDebugRenderer debugRenderer;
-    private Body tank1Body;
-    private Body tank2Body;
-    private Body groundBody;
-    OrthographicCamera camera;
-    Viewport viewport;
+    private transient World world;
+    private transient Box2DDebugRenderer debugRenderer;
+    public transient Body tank1Body;
+    public transient Body tank2Body;
+    private transient Body groundBody;
+    transient OrthographicCamera camera;
+    transient Viewport viewport;
 
-    private SpriteBatch batch;
-    private Texture tank1LowerTexture;
-    private Texture tank1TurretTexture;
-    private Texture tank2LowerTexture;
-    private Texture tank2TurretTexture;
-    private Texture groundTexture;
-    private Texture fuel1Texture;
-    private Texture fuel2Texture;
+    private transient SpriteBatch batch;
+    public transient Texture atomicLower;
+    public transient Texture atomicTurret;
+    public transient Texture dubstepLower;
+    public transient Texture dubstepTurret;
+    public transient Texture spectreLower;
+    public transient Texture spectreTurret;
+    public transient Texture atomicLowerMirror;
+    public transient Texture atomicTurretMirror;
+    public transient Texture dubstepLowerMirror;
+    public transient Texture dubstepTurretMirror;
+    public transient Texture spectreLowerMirror;
+    public transient Texture spectreTurretMirror;
+    private transient Texture tank1LowerTexture;
+    private transient Texture tank1TurretTexture;
+    private transient Texture tank2LowerTexture;
+    private transient Texture tank2TurretTexture;
+    private transient Texture groundTexture;
+    private transient Texture fuel1Texture;
+    private transient Texture fuel2Texture;
 
-    private Sprite tank1LowerSprite;
-    private Sprite tank1TurretSprite;
-    private Sprite tank2LowerSprite;
-    private Sprite tank2TurretSprite;
-    private Sprite groundSprite;
-    private Sprite fuel1Sprite;
-    private Sprite fuel2Sprite;
+    private transient Sprite tank1LowerSprite;
+    private transient Sprite tank1TurretSprite;
+    private transient Sprite tank2LowerSprite;
+    private transient Sprite tank2TurretSprite;
+    private transient Sprite groundSprite;
+    public transient Sprite fuel1Sprite;
+    public transient Sprite fuel2Sprite;
     public User u1;
     public User u2;
+
 
     int turn = 1;
     float maxHp = 1000f;
 
-    Animation<TextureRegion> explosionAnimation;
-    Texture explosionSheet;
+    transient Animation<TextureRegion> explosionAnimation;
+    transient Texture explosionSheet;
     float stateTime;
     int cols = 8;
     int rows = 6;
     boolean animation = false;
-    public GameScreen(final TankStars game) {
+    public GameScreen(final TankStars game, int s1, int s2) {
+        this.s1 = s1;
+        this.s2 = s2;
         this.game = game;
         this.world = new World(new Vector2(0,-10), true);
         this.debugRenderer = new Box2DDebugRenderer();
@@ -138,6 +157,36 @@ public class GameScreen implements Screen, Serializable {
         hpImage2 = new Texture("hp-2.png");
         explosionSheet = new Texture("explosion-spritesheet.png");
         powerTexture = new Texture("power.png");
+
+        System.out.printf("s1 = %d & s2 = %d\n", this.s1, this.s2);
+
+        //Player 1 tanks
+        if (this.s1 == 1) {
+            this.tank1LowerTexture = new Texture("atomic-lower.png");
+            tank1TurretTexture = new Texture("atomic-turret.png");
+        }
+        else if (s1 == 2) {
+            this.tank1LowerTexture = new Texture("dubstep-lower.png");
+            tank1TurretTexture = new Texture("dubstep-turret.png");
+        }
+        else {
+            this.tank1LowerTexture= new Texture("spectre-lower.png");
+            tank1TurretTexture = new Texture("spectre-turret.png");
+        }
+
+        //Player 2 tanks
+        if (this.s2 == 1) {
+            this.tank2LowerTexture = new Texture("atomic-mirror-lower.png");
+            tank2TurretTexture = new Texture("atomic-mirror-turret.png");
+        }
+        else if (s2 == 2) {
+            this.tank2LowerTexture = new Texture("dubstep-mirror-lower.png");
+            tank2TurretTexture = new Texture("dubstep-mirror-turret.png");
+        }
+        else {
+            this.tank2LowerTexture= new Texture("spectre-mirror-lower.png");
+            tank2TurretTexture = new Texture("spectre-mirror-turret.png");
+        }
 
         //Power
         power1Sprite = new Sprite(powerTexture);
@@ -202,14 +251,14 @@ public class GameScreen implements Screen, Serializable {
         //Left tank
 
         //Lower
-        this.tank1LowerTexture = new Texture("atomic-lower.png");
+//        this.tank1LowerTexture = new Texture("atomic-lower.png");
         this.tank1LowerSprite = new Sprite(tank1LowerTexture);
         this.tank1LowerSprite.setOrigin(0,0);
         this.tank1LowerSprite.setScale(1f);
         this.tank1LowerSprite.setPosition(0,500);
 
         //Turret
-        this.tank1TurretTexture = new Texture("atomic-turret.png");
+//        this.tank1TurretTexture = new Texture("atomic-turret.png");
         this.tank1TurretSprite = new Sprite(tank1TurretTexture);
         this.tank1TurretSprite.setOrigin(0,0);
         this.tank1TurretSprite.setPosition(0,500);
@@ -232,14 +281,14 @@ public class GameScreen implements Screen, Serializable {
         //Right tank
 
         //Lower
-        this.tank2LowerTexture = new Texture("dubstep-mirror-lower.png");
+//        this.tank2LowerTexture = new Texture("dubstep-mirror-lower.png");
         this.tank2LowerSprite = new Sprite(tank2LowerTexture);
         this.tank2LowerSprite.setOrigin(0,0);
         this.tank2LowerSprite.setScale(1f);
         this.tank2LowerSprite.setPosition(100,500);
 
         //Turret
-        this.tank2TurretTexture = new Texture("dubstep-mirror-turret.png");
+//        this.tank2TurretTexture = new Texture("dubstep-mirror-turret.png");
         this.tank2TurretSprite = new Sprite(tank2TurretTexture);
         this.tank2TurretSprite.setOrigin(this.tank1TurretSprite.getWidth() - 5,0);
         this.tank2TurretSprite.setScale(1f);
@@ -319,7 +368,7 @@ public class GameScreen implements Screen, Serializable {
         return groundBody;
     }
 
-    public void update(float delta) {
+    public void update(float delta) throws InterruptedException {
         camera.update();
         updateInput(delta);
         world.step(1/60f, 6, 2);
@@ -373,14 +422,21 @@ public class GameScreen implements Screen, Serializable {
                     animation = true;
                 }
 
-                if (turn == 1 && u1.hp > 0) {
+                if (turn == 1) {
                     if (f1.getBody() == projectile.projectileBody && f2.getBody() == groundBody || f2.getBody() == projectile.projectileBody && f1.getBody() == groundBody) {
                         //animation for explosion
 //                        animation = true;
                         //check if the radius is enough to hit second tank
                         float distance = Math.abs(projectile.projectileBody.getPosition().x - u2.tankLowerSprite.getX());
                         float damage = projectile.calculateDamage(false, distance);
-                        u2.hp -= damage*u2.damageRate;
+
+                        if (u2.hp > 0) {
+                            u2.hp -= damage*u2.damageRate;
+                        }
+                        else if (damage*u2.damageRate > u2.hp) {
+                            u2.hp = 0;
+                        }
+
                         hp2.setScale(u2.hp/1000, 1);
                     }
                     if (f1.getBody() == projectile.projectileBody && f2.getBody() == u2.tankBody || f2.getBody() == projectile.projectileBody && f1.getBody() == u2.tankBody) {
@@ -388,7 +444,14 @@ public class GameScreen implements Screen, Serializable {
 //                        animation = true;
                         //deal max amount of damage
                         float damage = projectile.calculateDamage(true, 0);
-                        u2.hp -= damage*u2.damageRate;
+
+                        if (u2.hp > 0) {
+                            u2.hp -= damage*u2.damageRate;
+                        }
+                        else if (damage*u2.damageRate > u2.hp) {
+                            u2.hp = 0;
+                        }
+
                         hp2.setScale(u2.hp/1000, 1);
                     }
                     if (f1.getBody() == projectile.projectileBody && f2.getBody() == u1.tankBody || f2.getBody() == projectile.projectileBody && f1.getBody() == u1.tankBody) {
@@ -396,17 +459,31 @@ public class GameScreen implements Screen, Serializable {
 //                        animation = true;
                         //again deal max amount of damage
                         float damage = projectile.calculateDamage(true, 0);
-                        u1.hp -= damage*u1.damageRate;
+
+                        if (u1.hp > 0) {
+                            u1.hp -= damage*u1.damageRate;
+                        }
+                        else if (damage*u1.damageRate > u1.hp) {
+                            u1.hp = 0;
+                        }
+
                         hp1.setScale(u1.hp/1000, 1);
                     }
                 }
-                else if (turn == 2 && u2.hp > 0) {
+                else if (turn == 2) {
                     if (f1.getBody() == projectile.projectileBody && f2.getBody() == groundBody || f2.getBody() == projectile.projectileBody && f1.getBody() == groundBody) {
                         //animation for explosion
                         //check if the radius is enough to hit second tank
                         float distance = Math.abs(projectile.projectileBody.getPosition().x - u1.tankLowerSprite.getX());
                         float damage = projectile.calculateDamage(false, distance);
-                        u1.hp -= damage*u1.damageRate;
+
+                        if (u1.hp > 0) {
+                            u1.hp -= damage*u1.damageRate;
+                        }
+                        else if (damage*u1.damageRate > u1.hp) {
+                            u1.hp = 0;
+                        }
+
                         hp1.setScale(u1.hp/1000, 1);
                     }
                     if (f1.getBody() == projectile.projectileBody && f2.getBody() == u1.tankBody || f2.getBody() == projectile.projectileBody && f1.getBody() == u1.tankBody) {
@@ -414,9 +491,16 @@ public class GameScreen implements Screen, Serializable {
                         animation = true;
                         //deal max amount of damage
                         float damage = projectile.calculateDamage(true, 0);
-                        u1.hp -= damage*u1.damageRate;
+
+                        if (u1.hp > 0) {
+                            u1.hp -= damage*u1.damageRate;
+                        }
+                        else if (damage*u1.damageRate > u1.hp) {
+                            u1.hp = 0;
+                        }
                         hp1.setScale(u1.hp/1000, 1);
                     }
+
                 }
 
 //                world.destroyBody(projectile.projectileBody);
@@ -441,12 +525,14 @@ public class GameScreen implements Screen, Serializable {
         });
     }
 
-    public void gameOver() {
+    public void gameOver() throws InterruptedException {
         System.out.println("Game Over");
+        TimeUnit.SECONDS.sleep(1);
+        game.setScreen(game.mainMenuScreen);
     }
 
 
-    public void updateInput(float delta) {
+    public void updateInput(float delta) throws InterruptedException {
         float fx1 = 0;
         float rx1 = tank1TurretSprite.getRotation();
         float fx2 = 0;
@@ -548,7 +634,13 @@ public class GameScreen implements Screen, Serializable {
         }
 
         u1.tankBody.setLinearVelocity(new Vector2(fx1*speedFactor, u1.tankBody.getLinearVelocity().y));
-        tank2Body.setLinearVelocity(new Vector2(fx2*speedFactor, tank2Body.getLinearVelocity().y));
+        u1.x = u1.tankBody.getPosition().x*PPM;
+        u1.y = u1.tankBody.getPosition().y*PPM;
+
+        u2.tankBody.setLinearVelocity(new Vector2(fx2*speedFactor, tank2Body.getLinearVelocity().y));
+        u2.x = u2.tankBody.getPosition().x*PPM;
+        u2.y = u2.tankBody.getPosition().y*PPM;
+
         tank1TurretSprite.setRotation(rx1);
         tank2TurretSprite.setRotation(rx2);
 
@@ -558,12 +650,16 @@ public class GameScreen implements Screen, Serializable {
         u1.powerSprite.setScale((float) u1.power/1000, 1);
         u2.powerSprite.setScale((float) u2.power/1000, 1);
 
-        u1.tankBody.setLinearVelocity(new Vector2(fx1*speedFactor, u1.tankBody.getLinearVelocity().y));
+//        u1.tankBody.setLinearVelocity(new Vector2(fx1*speedFactor, u1.tankBody.getLinearVelocity().y));
     }
 
 
     public void render(float delta) {
-        update(delta);
+        try {
+            update(delta);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         ScreenUtils.clear(0, 0, 0.2f, 1);
         game.batch.setProjectionMatrix(camera.combined);
 
@@ -614,37 +710,47 @@ public class GameScreen implements Screen, Serializable {
 
     public void serialize() throws IOException {
         ObjectOutputStream savedGames = null;
-        Scanner scan = null;
-        Writer wr = null;
-        FileInputStream numberGamesIn = null;
+//        Scanner scan = null;
+//        Writer wr = null;
+//        FileReader numberGamesIn = null;
 
         try {
-            numberGamesIn = new FileInputStream("number.txt");
-            wr = new FileWriter("number.txt");
-            scan = new Scanner(numberGamesIn);
-            int num = scan.nextInt();
-            if (num == 0) {
+//            numberGamesIn = new FileReader("number.txt");
+//            wr = new FileWriter("number.txt");
+//            scan = new Scanner(numberGamesIn);
+
+//            int num = scan.nextInt();
+            int num = TankStars.numSavedGames;
+//            if (num == 0) {
+//                savedGames = new ObjectOutputStream(new FileOutputStream("file1.txt"));
+////                wr.write(1);
+//            }
+            if (num == 1){
                 savedGames = new ObjectOutputStream(new FileOutputStream("file1.txt"));
-                wr.write(1);
-            }
-            else if (num == 1){
-                savedGames = new ObjectOutputStream(new FileOutputStream("file2.txt"));
-                wr.write(2);
+//                wr.write(2);
             }
             else if (num == 2) {
-                savedGames = new ObjectOutputStream(new FileOutputStream("file3.txt"));
-                wr.write(3);
+                savedGames = new ObjectOutputStream(new FileOutputStream("file2.txt"));
+//                wr.write(3);
             }
             else {
-                savedGames = new ObjectOutputStream(new FileOutputStream("file1.txt"));
-                wr.write(3);
+                savedGames = new ObjectOutputStream(new FileOutputStream("file3.txt"));
+//                wr.write(3);
             }
+            savedGames.writeObject(this);
         }
         finally {
-            savedGames.writeObject(this);
-            savedGames.close();
-            wr.close();
-            numberGamesIn.close();
+            if (savedGames != null) {
+                savedGames.close();
+            }
+//            if (wr != null) {
+//                wr.close();
+//            }
+//
+//            if (numberGamesIn != null) {
+//                numberGamesIn.close();
+//            }
+
         }
     }
 

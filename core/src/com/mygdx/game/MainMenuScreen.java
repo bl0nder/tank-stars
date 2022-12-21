@@ -14,6 +14,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import org.w3c.dom.Text;
 
+import java.io.*;
+
 import static java.lang.System.exit;
 
 public class MainMenuScreen implements Screen {
@@ -227,13 +229,19 @@ public class MainMenuScreen implements Screen {
                 game.setScreen(game.selectionScreen);
             }
             if (buttonLoadGame.sprite.getBoundingRectangle().contains(touchPoint.x,touchPoint.y)) {
-                if (game.gameScreen == null) {
-                    GameScreen newScreen = new GameScreen(game);
-                    game.gameScreen = newScreen;
-                }
-                game.setScreen(game.gameScreen);
+                LoadGameScreen newScreen = new LoadGameScreen(game);
+                game.setScreen(newScreen);
             }
             if (buttonExit.sprite.getBoundingRectangle().contains(touchPoint.x,touchPoint.y)) {
+                PrintWriter fw;
+                try {
+                    fw = new PrintWriter(new FileWriter("number.txt"));
+                    fw.println(TankStars.numSavedGames);
+                } catch (IOException ex) {
+                    ex.getMessage();
+                    ex.printStackTrace();
+                }
+
                 exit(0);
             }
         }

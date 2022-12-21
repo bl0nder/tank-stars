@@ -3,7 +3,11 @@ package com.mygdx.game;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class TankStars extends Game {
+import java.io.Serializable;
+
+public class TankStars extends Game implements Serializable {
+
+	public static int numSavedGames;
 
 	public SpriteBatch batch;
 	public PauseScreen pauseScreen;
@@ -14,11 +18,12 @@ public class TankStars extends Game {
 	@Override
 	public void create() {
 		batch = new SpriteBatch();
-		this.setScreen(new GameScreen (this));
+		numSavedGames = 0;
 		this.pauseScreen = new PauseScreen(this);
-		this.gameScreen = new GameScreen(this);
+		this.gameScreen = new GameScreen(this, 0, 0);
 		this.mainMenuScreen = new MainMenuScreen(this);
 		this.selectionScreen = new SelectionScreen(this);
+		this.setScreen(this.mainMenuScreen);
 	}
 	@Override
 	public void render() {

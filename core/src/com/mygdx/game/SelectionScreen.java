@@ -195,9 +195,10 @@ public class SelectionScreen implements Screen {
                 }
             }
             if (playButton.getBoundingRectangle().contains(touchPoint.x, touchPoint.y)) {
-                GameScreen newScreen = new GameScreen(game);
+                System.out.printf("s1 = %d & s2 = %d\n", s1, s2);
+                GameScreen newScreen = new GameScreen(game, s1, s2);
                 game.gameScreen = newScreen;
-                game.setScreen(game.gameScreen);
+                game.setScreen(newScreen);
             }
         }
     }

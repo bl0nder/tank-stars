@@ -93,15 +93,16 @@ public class LoadGameScreen implements Screen, Serializable {
 
     public void deserialize(int file) throws IOException, ClassNotFoundException{
         ObjectInputStream savedGames  = null;
-        Scanner scan = null;
-        Writer wr = null;
-        FileInputStream numberGamesIn = null;
+//        Scanner scan = null;
+//        Writer wr = null;
+//        FileInputStream numberGamesIn = null;
 
         try {
-            numberGamesIn = new FileInputStream("number.txt");
-            wr = new FileWriter("number.txt");
-            scan = new Scanner(numberGamesIn);
-            int num = scan.nextInt();
+//            numberGamesIn = new FileInputStream("number.txt");
+//            wr = new FileWriter("number.txt");
+//            scan = new Scanner(numberGamesIn);
+//            int num = scan.nextInt();
+            int num = TankStars.numSavedGames;
             if (file > num) {
                 return;
             }
@@ -116,16 +117,24 @@ public class LoadGameScreen implements Screen, Serializable {
             User user1 = gameScreen.u1;
             User user2 = gameScreen.u2;
 
-            GameScreen newScreen = new GameScreen(game);
-            newScreen.u1 = user1;
-            newScreen.u2 = user2;
-            newScreen.tank1.setPosition(1, 1);
-            newScreen.tank2.setPosition(1, 2);
-            newScreen. hp1.setScale(gameScreen.u1.hp/1000, 1);
+            GameScreen newScreen = new GameScreen(game, gameScreen.s1, gameScreen.s2);
+//            newScreen.u1 = user1;
+//            newScreen.u2 = user2;
+            newScreen.u1.tankBody.setTransform(gameScreen.u1.x/100, gameScreen.u1.y/100, 0);
+            newScreen.u2.tankBody.setTransform(gameScreen.u2.x/100, gameScreen.u2.y/100, 0);
+
+            newScreen.u1.hp = gameScreen.u1.hp;
+            newScreen.u2.hp = gameScreen.u2.hp;
+
+            newScreen.u1.fuel = gameScreen.u1.fuel;
+            newScreen.u2.fuel = gameScreen.u2.fuel;
+
+            newScreen.hp1.setScale(gameScreen.u1.hp/1000, 1);
             newScreen.hp2.setScale(gameScreen.u2.hp/1000, 1);
             //add the code for scaling fuel images here
-            newScreen.u1.fuelSprite.setScale(newScreen.u1.fuel, newScreen.u1.fuelSprite.getScaleY());
-            newScreen.u2.fuelSprite.setScale(newScreen.u2.fuel, newScreen.u2.fuelSprite.getScaleY());
+            newScreen.u1.fuelSprite.setScale(gameScreen.u1.fuel, 1);
+            newScreen.u2.fuelSprite.setScale(gameScreen.u2.fuel, 1);
+
             game.gameScreen = newScreen;
             game.setScreen(newScreen);
         }
@@ -141,7 +150,7 @@ public class LoadGameScreen implements Screen, Serializable {
             if (loadButton2.getBoundingRectangle().contains(touchPoint.x,touchPoint.y)) {
                 deserialize(2);
             }
-            if (loadButton2.getBoundingRectangle().contains(touchPoint.x,touchPoint.y)) {
+            if (loadButton3.getBoundingRectangle().contains(touchPoint.x,touchPoint.y)) {
                 deserialize(3);
             }
             if (backButton.getBoundingRectangle().contains(touchPoint.x,touchPoint.y)) {
@@ -158,7 +167,13 @@ public class LoadGameScreen implements Screen, Serializable {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0.2f, 1);
-//        updateScreen();
+        try {
+            updateScreen();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
 
