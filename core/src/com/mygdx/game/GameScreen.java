@@ -212,36 +212,36 @@ public class GameScreen implements Screen, Serializable {
         tree11 = new Sprite(tree1Image);
         tree11.setOrigin(0, 0);
         tree11.setScale(0.25f, 0.25f);
-        tree11.setPosition(50, 200);
+        tree11.setPosition(50, 50);
         tree12 = new Sprite(tree1Image);
         tree12.setOrigin(0, 0);
         tree12.setScale(0.25f, 0.25f);
-        tree12.setPosition(1280 - 50 - 50, 275);
+        tree12.setPosition(1280 - 50 - 50, 50);
         tree21 = new Sprite(tree2Image);
         tree21.setOrigin(0, 0);
         tree21.setScale(0.25f, 0.25f);
-        tree21.setPosition(500, 235);
+        tree21.setPosition(500, 50);
         tree22 = new Sprite(tree2Image);
         tree22.setOrigin(0, 0);
         tree22.setScale(0.25f, 0.25f);
-        tree22.setPosition(300, 230);
+        tree22.setPosition(300, 50);
         tree3 = new Sprite(tree3Image);
         tree3.setOrigin(0, 0);
         tree3.setScale(0.25f, 0.25f);
-        tree3.setPosition(750, 265);
+        tree3.setPosition(750, 50);
         tree4 = new Sprite(tree4Image);
         tree4.setOrigin(0, 0);
         tree4.setScale(0.25f, 0.25f);
-        tree4.setPosition(900, 235);
+        tree4.setPosition(900, 50);
 
         tower1 = new Sprite(tower1Image);
         tower1.setOrigin(0, 0);
         tower1.setScale(0.25f);
-        tower1.setPosition(825, 235);
+        tower1.setPosition(825, 50);
         tower2 = new Sprite(tower2Image);
         tower2.setOrigin(0, 0);
         tower2.setScale(0.25f);
-        tower2.setPosition(200, 200);
+        tower2.setPosition(200, 50);
 
         pauseButton = new Sprite(pauseButtonImage);
         pauseButton.setOrigin(0, 0);
@@ -295,8 +295,8 @@ public class GameScreen implements Screen, Serializable {
         this.tank2TurretSprite.setPosition(100,500);
 
         //CreateTank for bodies and fixtures
-        this.tank1Body = createTank(10,0);
-        this.tank2Body = createTank(500,0);
+        this.tank1Body = createTank(100,0);
+        this.tank2Body = createTank(1180,0);
 
         this.u1 = new User(tank1Body, tank1LowerSprite, tank1TurretSprite, fuel1Sprite, power1Sprite);
         this.u2 = new User(tank2Body, tank2LowerSprite, tank2TurretSprite, fuel2Sprite, power2Sprite);
@@ -703,8 +703,6 @@ public class GameScreen implements Screen, Serializable {
         power1Sprite.draw(game.batch);
         power2Sprite.draw(game.batch);
         game.batch.end();
-
-        debugRenderer.render(world, camera.combined.scl(PPM));
 
     }
 
