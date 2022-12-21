@@ -16,6 +16,6 @@ public class DesktopLauncher {
 		config.setWindowedMode(worldWidth,worldHeight);
 		config.setTitle("Tank Stars");
 		config.setResizable(false);
-		new Lwjgl3Application(new TankStars(), config);
+		new Lwjgl3Application(TankStars.getInstance(), config);
 	}
 }

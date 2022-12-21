@@ -8,12 +8,24 @@ import java.io.Serializable;
 public class TankStars extends Game implements Serializable {
 
 	public static int numSavedGames;
+	public static TankStars instance;
 
 	public SpriteBatch batch;
 	public PauseScreen pauseScreen;
 	public GameScreen gameScreen;
 	public SelectionScreen selectionScreen;
 	public MainMenuScreen mainMenuScreen;
+
+	private TankStars() {
+
+	}
+
+	public static TankStars getInstance() {
+		if (instance == null) {
+			instance = new TankStars();
+		}
+		return instance;
+	}
 
 	@Override
 	public void create() {
