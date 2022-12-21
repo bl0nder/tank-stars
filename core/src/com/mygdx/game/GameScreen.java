@@ -17,6 +17,9 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
@@ -312,7 +315,32 @@ public class GameScreen implements Screen, Serializable {
         //Heavy shit
         TextureRegion[][] tmp = TextureRegion.split(explosionSheet, explosionSheet.getWidth()/cols, explosionSheet.getHeight()/rows);
         TextureRegion[] frames = new TextureRegion[cols*rows];
+
+//        ArrayList<Integer> arr1 = new ArrayList<Integer>();
+//        ArrayList<Integer> arr2 = new ArrayList<Integer>();
+//
+//        int k;
+//        for (k=0; k<rows; k++) {
+//            arr1.add(k);
+//        }
+//        for (k=0; k<cols; k++) {
+//            arr2.add(k);
+//        }
         int index = 0;
+//
+//        Iterator<Integer> it1 = arr1.iterator();
+//        Iterator<Integer> it2 = arr2.iterator();
+//
+//        int i1;
+//        int i2;
+//        while (it1.hasNext()) {
+//            i1 = it1.next();
+//            while(it2.hasNext()) {
+//                i2 = it2.next();
+//                frames[index++] = tmp[i1][i2];
+//            }
+//        }
+//
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 frames[index++] = tmp[i][j];
