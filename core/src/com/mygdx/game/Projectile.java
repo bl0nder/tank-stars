@@ -23,11 +23,12 @@ import com.badlogic.gdx.physics.box2d.*;
 
 public class Projectile {
     Sprite projectileSprite;
+    final static float PPM = 100f;
     Body projectileBody;
-    int damageRadius = 100;
+    float damageRadius = 100;
     float maxDamage = (float) 1000/3 + 1;
 
-    public Projectile(String path, float x, float y, float scale, World world, float density, float restitution, float turretAngle, int power) {
+    public Projectile(String path, float x, float y, float scale, World world, float density, float restitution, float turretAngle, int power, int turn) {
         Texture projectileImage = new Texture(path);
         Sprite projectile = new Sprite(projectileImage);
         projectile.setOrigin(0, 0);
@@ -37,22 +38,28 @@ public class Projectile {
 
         BodyDef bodydef = new BodyDef();
         bodydef.type = BodyDef.BodyType.DynamicBody;
-        bodydef.position.set(x, y);
+        bodydef.position.set(projectile.getX()/PPM, projectile.getY()/PPM);
 
         Body body = world.createBody(bodydef);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(this.projectileSprite.getWidth()/2, this.projectileSprite.getHeight()/2);
+        shape.setAsBox(this.projectileSprite.getWidth()/2/PPM, this.projectileSprite.getHeight()/2/PPM);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = density;
-//        fixtureDef.friction = friction;
+        fixtureDef.friction = 10000;
         fixtureDef.restitution = restitution;
 
         Fixture fixture = body.createFixture(fixtureDef);
 
-        body.setLinearVelocity(new Vector2((float) Math.cos(turretAngle)*power, (float)Math.sin(turretAngle)*power));
+        if (turn == 1) {
+            body.setLinearVelocity(new Vector2((float) Math.cos(turretAngle*Math.PI/180)*power/PPM, (float)Math.sin(turretAngle*Math.PI/180)*power/PPM));
+        }
+        if (turn == 2) {
+            body.setLinearVelocity(new Vector2((float) -Math.cos(turretAngle*Math.PI/180)*power/PPM, (float)Math.sin(turretAngle*Math.PI/180)*power/PPM));
+        }
+
         this.projectileBody = body;
 
         shape.dispose();

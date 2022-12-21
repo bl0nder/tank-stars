@@ -16,15 +16,15 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-public class GameScreen implements Screen {
+import java.io.*;
+import java.util.Scanner;
+
+public class GameScreen implements Screen, Serializable {
     final TankStars game;
     final static float PPM = 100f;
     public final int screenWidth = 1280;
     public final int screenHeight = 720;
     final float maxFuel = 1;
-    final float fuelDepletionSpeed = 0.005f;
-    private float fuel1 = maxFuel;
-    private float fuel2 = maxFuel;
 
     //Aditya hello
     final int uniqueID = 1;
@@ -46,8 +46,11 @@ public class GameScreen implements Screen {
     Texture fuelImage;
     Texture hpImage1;
     Texture hpImage2;
+    Texture powerTexture;
 
     Sprite bg;
+    Sprite power1Sprite;
+    Sprite power2Sprite;
     Sprite tank1;
     Sprite tank2;
     Sprite terrain;
@@ -95,6 +98,8 @@ public class GameScreen implements Screen {
     private Sprite groundSprite;
     private Sprite fuel1Sprite;
     private Sprite fuel2Sprite;
+    public User u1;
+    public User u2;
 
     int turn = 1;
     float maxHp = 1000f;
@@ -104,7 +109,7 @@ public class GameScreen implements Screen {
     float stateTime;
     int cols = 8;
     int rows = 6;
-    boolean animation = true;
+    boolean animation = false;
     public GameScreen(final TankStars game) {
         this.game = game;
         this.world = new World(new Vector2(0,-10), true);
@@ -115,6 +120,8 @@ public class GameScreen implements Screen {
         viewport = new FitViewport(1280,720, camera);
         camera.update();
         camera.setToOrtho(false, 1280, 720);
+
+
 
         //Textures
         bgImage = new Texture(Gdx.files.internal("bg.png"));
@@ -130,6 +137,11 @@ public class GameScreen implements Screen {
         hpImage1 = new Texture("hp-1.png");
         hpImage2 = new Texture("hp-2.png");
         explosionSheet = new Texture("explosion-spritesheet.png");
+        powerTexture = new Texture("power.png");
+
+        //Power
+        power1Sprite = new Sprite(powerTexture);
+        power2Sprite = new Sprite(powerTexture);
 
         //bg
         bg = new Sprite(bgImage);
@@ -187,8 +199,6 @@ public class GameScreen implements Screen {
         pauseButton.setScale(0.75f, 0.75f);
         pauseButton.setPosition(0, screenHeight - 30 - 50);
 
-
-
         //Left tank
 
         //Lower
@@ -204,6 +214,20 @@ public class GameScreen implements Screen {
         this.tank1TurretSprite.setOrigin(0,0);
         this.tank1TurretSprite.setPosition(0,500);
         this.tank1TurretSprite.setScale(1f);
+
+        //Fuel bar1
+        this.fuel1Texture = new Texture("fuel.png");
+        this.fuel1Sprite = new Sprite(fuel1Texture);
+        this.fuel1Sprite.setOrigin(0,0);
+        this.fuel1Sprite.setScale(1f, 1f);
+
+        //Fuel bar 2
+        this.fuel2Texture = new Texture("fuel.png");
+        this.fuel2Sprite = new Sprite(fuel2Texture);
+        this.fuel2Sprite.setOrigin(0,0);
+        this.fuel2Sprite.setScale(1f, 1f);
+
+
 
         //Right tank
 
@@ -222,20 +246,11 @@ public class GameScreen implements Screen {
         this.tank2TurretSprite.setPosition(100,500);
 
         //CreateTank for bodies and fixtures
-        this.tank1Body = createTank(0,500);
-        this.tank2Body = createTank(100,500);
+        this.tank1Body = createTank(10,0);
+        this.tank2Body = createTank(500,0);
 
-        //Fuel bar1
-        this.fuel1Texture = new Texture("fuel.png");
-        this.fuel1Sprite = new Sprite(fuel1Texture);
-        this.fuel1Sprite.setOrigin(0,0);
-        this.fuel1Sprite.setScale(1f, 1f);
-
-        //Fuel bar 2
-        this.fuel2Texture = new Texture("fuel.png");
-        this.fuel2Sprite = new Sprite(fuel2Texture);
-        this.fuel2Sprite.setOrigin(0,0);
-        this.fuel2Sprite.setScale(1f, 1f);
+        this.u1 = new User(tank1Body, tank1LowerSprite, tank1TurretSprite, fuel1Sprite, power1Sprite);
+        this.u2 = new User(tank2Body, tank2LowerSprite, tank2TurretSprite, fuel2Sprite, power2Sprite);
 
         //Ground
         this.groundBody = createGround();
@@ -259,72 +274,9 @@ public class GameScreen implements Screen {
         stateTime = 0f;
 
         //collision detection and setting for animation
-        world.setContactListener(new ContactListener() {
-            @Override
-            public void beginContact(Contact contact) {
-                Fixture f1 = contact.getFixtureA();
-                Fixture f2 = contact.getFixtureB();
 
-                if (turn == 1) {
-                    if (f1.getBody() == projectile.projectileBody && f2.getBody() == groundBody || f2.getBody() == projectile.projectileBody && f1.getBody() == groundBody) {
-                        //animation for explosion
-                        animation = true;
-                        //check if the radius is enough to hit second tank
-                        float distance = Math.abs(projectile.projectileBody.getPosition().x - tank2LowerSprite.getX());
-                        float damage = projectile.calculateDamage(false, distance);
-                        hp1.setScale((maxHp - damage)/maxHp, 1);
-                    }
-                    if (f1.getBody() == projectile.projectileBody && f2.getBody() == tank2Body || f2.getBody() == projectile.projectileBody && f1.getBody() == tank2Body) {
-                        //animation for explosion
-                        animation = true;
-                        //deal max amount of damage
-                        float damage = projectile.calculateDamage(true, 0);
-                        hp1.setScale((maxHp - damage)/maxHp, 1);
-                    }
-//                    if (f1.getBody() == projectile.projectileBody && f2.getBody() == tank2LowerBody || f1.getBody() == projectile.projectileBody && f2.getBody() == tank2LowerBody) {
-//                        //animation for explosion
-//                        animation = true;
-//                        //again deal max amount of damage
-//                        float damage = projectile.calculateDamage(true, 0);
-//                        hp1.setScale((maxHp - damage)/maxHp, 1);
-//                    }
-                }
-                else if (turn == 2) {
-                    if (f1.getBody() == projectile.projectileBody && f2.getBody() == groundBody || f2.getBody() == projectile.projectileBody && f1.getBody() == groundBody) {
-                        //animation for explosion
-                        //check if the radius is enough to hit second tank
-                        float distance = Math.abs(projectile.projectileBody.getPosition().x - tank1LowerSprite.getX());
-                        float damage = projectile.calculateDamage(false, distance);
-                        hp2.setScale((maxHp - damage)/maxHp, 1);
-                    }
-                    if (f1.getBody() == projectile.projectileBody && f2.getBody() == tank1Body || f2.getBody() == projectile.projectileBody && f1.getBody() == tank1Body) {
-                        //animation for explosion
-                        animation = true;
-                        //deal max amount of damage
-                        float damage = projectile.calculateDamage(true, 0);
-                        hp2.setScale((maxHp - damage)/maxHp, 1);
-                    }
-                }
 
-            }
-
-            @Override
-            public void endContact(Contact contact) {
-                animation = false;
-            }
-
-            @Override
-            public void preSolve(Contact contact, Manifold oldManifold) {
-
-            }
-
-            @Override
-            public void postSolve(Contact contact, ContactImpulse impulse) {
-
-            }
-        });
-
-        projectile = new Projectile("projectile.png", 100 + 55, 200 + 15 + 40, 1f, world, 0.5f, 0.5f, 45f, 100);
+//        projectile = new Projectile("projectile.png", 100 + 55, 200 + 15 + 40, 1f, world, 0.5f, 0f, 20f, 500);
 //        groundSprite.setPosition(0,-550);
 
     }
@@ -372,16 +324,127 @@ public class GameScreen implements Screen {
         updateInput(delta);
         world.step(1/60f, 6, 2);
         game.batch.setProjectionMatrix(camera.combined);
-        this.tank1LowerSprite.setPosition(this.tank1Body.getPosition().x*PPM - (tank1LowerSprite.getWidth()*tank1LowerSprite.getScaleX())/2, this.tank1Body.getPosition().y*PPM - (tank1LowerSprite.getHeight()*tank1LowerSprite.getScaleY())/2);
-        this.tank1TurretSprite.setPosition(this.tank1Body.getPosition().x*PPM - (tank1TurretSprite.getWidth()*tank1TurretSprite.getScaleX())/2 + 3, this.tank1Body.getPosition().y*PPM + 9);
-        this.tank2LowerSprite.setPosition(this.tank2Body.getPosition().x*PPM - (tank2LowerSprite.getWidth()*tank2LowerSprite.getScaleX())/2, this.tank2Body.getPosition().y*PPM - (tank2LowerSprite.getHeight()*tank2LowerSprite.getScaleY())/2);
-        this.tank2TurretSprite.setPosition(this.tank2Body.getPosition().x*PPM - (tank2TurretSprite.getWidth()*tank2TurretSprite.getScaleX())/2, this.tank2Body.getPosition().y*PPM + 9);
+        u1.tankLowerSprite.setPosition(u1.tankBody.getPosition().x*PPM - (tank1LowerSprite.getWidth()*tank1LowerSprite.getScaleX())/2, u1.tankBody.getPosition().y*PPM - (tank1LowerSprite.getHeight()*tank1LowerSprite.getScaleY())/2);
+        u1.tankTurretSprite.setPosition(u1.tankBody.getPosition().x*PPM - (tank1TurretSprite.getWidth()*tank1TurretSprite.getScaleX())/2 + 3, u1.tankBody.getPosition().y*PPM + 9);
+        u2.tankLowerSprite.setPosition(this.tank2Body.getPosition().x*PPM - (tank2LowerSprite.getWidth()*tank2LowerSprite.getScaleX())/2, this.tank2Body.getPosition().y*PPM - (tank2LowerSprite.getHeight()*tank2LowerSprite.getScaleY())/2);
+        u2.tankTurretSprite.setPosition(this.tank2Body.getPosition().x*PPM - (tank2TurretSprite.getWidth()*tank2TurretSprite.getScaleX())/2, this.tank2Body.getPosition().y*PPM + 9);
 //
         //Fuelbar
-        this.fuel1Sprite.setPosition(this.tank1Body.getPosition().x*PPM - (tank1LowerSprite.getWidth()*tank1LowerSprite.getScaleX())/2 - 13, this.tank1Body.getPosition().y*PPM - (tank1LowerSprite.getHeight()*tank1LowerSprite.getScaleY())/2 - 15);
-        this.fuel2Sprite.setPosition(this.tank2Body.getPosition().x*PPM - (tank2LowerSprite.getWidth()*tank2LowerSprite.getScaleX())/2 - 13, this.tank2Body.getPosition().y*PPM - (tank2LowerSprite.getHeight()*tank2LowerSprite.getScaleY())/2 - 15);
+        u1.fuelSprite.setPosition(u1.tankBody.getPosition().x*PPM - (u1.tankLowerSprite.getWidth()*u1.tankLowerSprite.getScaleX())/2 - 13, u1.tankBody.getPosition().y*PPM - (u1.tankLowerSprite.getHeight()*u1.tankLowerSprite.getScaleY())/2 - 15);
+        u2.fuelSprite.setPosition(u2.tankBody.getPosition().x*PPM - (u2.tankLowerSprite.getWidth()*u2.tankLowerSprite.getScaleX())/2 - 13, u2.tankBody.getPosition().y*PPM - (u2.tankLowerSprite.getHeight()*u2.tankLowerSprite.getScaleY())/2 - 15);
+
+        //power
+        u1.powerSprite.setPosition(u1.tankBody.getPosition().x*PPM - (u1.tankLowerSprite.getWidth()*u1.tankLowerSprite.getScaleX())/2 - 35, u1.tankBody.getPosition().y*PPM - (u1.tankLowerSprite.getHeight()*u1.tankLowerSprite.getScaleY())/2 + 45);
+        u2.powerSprite.setPosition(u2.tankBody.getPosition().x*PPM - (u2.tankLowerSprite.getWidth()*u2.tankLowerSprite.getScaleX())/2 - 35, u2.tankBody.getPosition().y*PPM - (u2.tankLowerSprite.getHeight()*u2.tankLowerSprite.getScaleY())/2 + 45);
 //        this.groundSprite.setPosition(this.groundBody.getPosition().x*PPM - (groundSprite.getWidth()*groundSprite.getScaleX())/2, this.groundBody.getPosition().y*PPM - (groundSprite.getHeight()*tank2LowerSprite.getScaleY())/2);
     }
+
+    public void fireProjectile() {
+        if (turn == 1) {
+            //add slider code (probably in the render loop itself since it would always need to be present)
+            //the slider could then be refreshed
+            //add enter to fire in updateInput and call this function
+            //power would need to be taken from the slider
+            projectile = new Projectile("projectile.png", u1.tankBody.getPosition().x*PPM + 40, u1.tankBody.getPosition().y*PPM + 40, 1f, world, 0.5f, 0f, u1.angle, u1.power, turn);
+            //damage is dealt through the contact fn itself
+            //need to add User class code there to subtract hp from their attribute and have the users as an attribute in the gameScreen class itself
+            //just add the tanks as an attribute for the user too and maybe the projectile as an attribute for the tank itself
+            //for the animation, when isAnimationFinished(float stateTime) returns true in the render loop (when drawing it) set stateTime to zero and animation to false
+            //then try and see if the animation works with more than one projectile
+            //if not we'll try and debug it
+            turn = 2;
+
+        }
+        else if (turn == 2) {
+            projectile = new Projectile("projectile.png", tank2Body.getPosition().x*PPM - 40, tank2Body.getPosition().y*PPM + 40, 1f, world, 0.5f, 0f, u2.angle, u2.power, turn);
+            turn = 1;
+        }
+
+    }
+
+    public void collision() {
+        world.setContactListener(new ContactListener() {
+            @Override
+            public void beginContact(Contact contact) {
+                Fixture f1 = contact.getFixtureA();
+                Fixture f2 = contact.getFixtureB();
+
+                if ((f1.getBody() != null && f2.getBody() != null)) {
+                    animation = true;
+                }
+
+                if (turn == 1 && u1.hp > 0) {
+                    if (f1.getBody() == projectile.projectileBody && f2.getBody() == groundBody || f2.getBody() == projectile.projectileBody && f1.getBody() == groundBody) {
+                        //animation for explosion
+//                        animation = true;
+                        //check if the radius is enough to hit second tank
+                        float distance = Math.abs(projectile.projectileBody.getPosition().x - u2.tankLowerSprite.getX());
+                        float damage = projectile.calculateDamage(false, distance);
+                        u2.hp -= damage*u2.damageRate;
+                        hp2.setScale(u2.hp/1000, 1);
+                    }
+                    if (f1.getBody() == projectile.projectileBody && f2.getBody() == u2.tankBody || f2.getBody() == projectile.projectileBody && f1.getBody() == u2.tankBody) {
+                        //animation for explosion
+//                        animation = true;
+                        //deal max amount of damage
+                        float damage = projectile.calculateDamage(true, 0);
+                        u2.hp -= damage*u2.damageRate;
+                        hp2.setScale(u2.hp/1000, 1);
+                    }
+                    if (f1.getBody() == projectile.projectileBody && f2.getBody() == u1.tankBody || f2.getBody() == projectile.projectileBody && f1.getBody() == u1.tankBody) {
+                        //animation for explosion
+//                        animation = true;
+                        //again deal max amount of damage
+                        float damage = projectile.calculateDamage(true, 0);
+                        u1.hp -= damage*u1.damageRate;
+                        hp1.setScale(u1.hp/1000, 1);
+                    }
+                }
+                else if (turn == 2 && u2.hp > 0) {
+                    if (f1.getBody() == projectile.projectileBody && f2.getBody() == groundBody || f2.getBody() == projectile.projectileBody && f1.getBody() == groundBody) {
+                        //animation for explosion
+                        //check if the radius is enough to hit second tank
+                        float distance = Math.abs(projectile.projectileBody.getPosition().x - u1.tankLowerSprite.getX());
+                        float damage = projectile.calculateDamage(false, distance);
+                        u1.hp -= damage*u1.damageRate;
+                        hp1.setScale(u1.hp/1000, 1);
+                    }
+                    if (f1.getBody() == projectile.projectileBody && f2.getBody() == u1.tankBody || f2.getBody() == projectile.projectileBody && f1.getBody() == u1.tankBody) {
+                        //animation for explosion
+                        animation = true;
+                        //deal max amount of damage
+                        float damage = projectile.calculateDamage(true, 0);
+                        u1.hp -= damage*u1.damageRate;
+                        hp1.setScale(u1.hp/1000, 1);
+                    }
+                }
+
+//                world.destroyBody(projectile.projectileBody);
+//                projectile.projectileSprite.getTexture().dispose();
+
+            }
+
+            @Override
+            public void endContact(Contact contact) {
+                animation = false;
+            }
+
+            @Override
+            public void preSolve(Contact contact, Manifold oldManifold) {
+
+            }
+
+            @Override
+            public void postSolve(Contact contact, ContactImpulse impulse) {
+
+            }
+        });
+    }
+
+    public void gameOver() {
+        System.out.println("Game Over");
+    }
+
 
     public void updateInput(float delta) {
         float fx1 = 0;
@@ -390,46 +453,54 @@ public class GameScreen implements Screen {
         float rx2 = tank2TurretSprite.getRotation();
         final float speedFactor = 1f;
 
+        if (u1.hp == 0 || u2.hp == 0) {
+            gameOver();
+        }
+
         if (Gdx.input.isKeyPressed(Keys.D) && this.turn == 1) {
-            if (((this.tank1LowerSprite.getX() + (this.tank1LowerSprite.getWidth()*this.tank1LowerSprite.getScaleX())) < Gdx.graphics.getWidth()) && fuel1 >= 0) {
+            if (((this.tank1LowerSprite.getX() + (this.tank1LowerSprite.getWidth()*this.tank1LowerSprite.getScaleX())) < Gdx.graphics.getWidth()) && u1.fuel >= 0) {
                 fx1 += 1;
-                fuel1 -= fuelDepletionSpeed;
+                u1.fuel -= u1.fuelDepletionSpeed;
             }
         }
         if (Gdx.input.isKeyPressed(Keys.A) && this.turn == 1) {
-            if (this.tank1LowerSprite.getX() > 0 && fuel1 >= 0) {
+            if (this.tank1LowerSprite.getX() > 0 && u1.fuel >= 0) {
                 fx1 -= 1;
-                fuel1 -= fuelDepletionSpeed;
+                u1.fuel -= u1.fuelDepletionSpeed;
             }
         }
         if (Gdx.input.isKeyPressed(Keys.DPAD_RIGHT) && turn == 2) {
-            if ((this.tank2LowerSprite.getX() + (this.tank2LowerSprite.getWidth()*this.tank2LowerSprite.getScaleX())) < Gdx.graphics.getWidth() && fuel2 >= 0) {
+            if ((this.tank2LowerSprite.getX() + (this.tank2LowerSprite.getWidth()*this.tank2LowerSprite.getScaleX())) < Gdx.graphics.getWidth() && u2.fuel >= 0) {
                 fx2 += 1;
-                fuel2 -= fuelDepletionSpeed;
+                u2.fuel -= u2.fuelDepletionSpeed;
             }
         }
 
         if (Gdx.input.isKeyPressed(Keys.DPAD_LEFT) && turn == 2) {
-            if (this.tank2LowerSprite.getX() > 0 && fuel2 >= 0) {
+            if (this.tank2LowerSprite.getX() > 0 && u2.fuel >= 0) {
                 fx2 -= 1;
-                fuel2 -= fuelDepletionSpeed;
+                u2.fuel -= u2.fuelDepletionSpeed;
             }
         }
 
         if (Gdx.input.isKeyPressed(Keys.W) && this.turn == 1) {
             rx1 += 1;
+            u1.angle = rx1;
         }
 
         if (Gdx.input.isKeyPressed(Keys.S) && this.turn == 1) {
             rx1 -= 1;
+            u1.angle = rx1;
         }
 
         if (Gdx.input.isKeyPressed(Keys.DPAD_UP) && this.turn == 2) {
             rx2 -= 1;
+            u2.angle = (float) Math.PI - rx2;
         }
 
         if (Gdx.input.isKeyPressed(Keys.DPAD_DOWN) && this.turn == 2) {
             rx2 += 1;
+            u2.angle = (float) Math.PI - rx2;
         }
 
         if(Gdx.input.justTouched()) {
@@ -444,21 +515,50 @@ public class GameScreen implements Screen {
             }
         }
 
+        if (Gdx.input.isKeyPressed(Keys.Q)) {
+            if (this.turn == 1 && u1.power > 0) {
+                u1.power -= 2;
+            }
+            if (this.turn == 2 && u2.power > 0) {
+                u2.power -= 2;
+            }
+        }
+
+        if (Gdx.input.isKeyPressed(Keys.E)) {
+            if (this.turn == 1 && u1.power < 1001) {
+                u1.power += 2;
+            }
+            if (this.turn == 2 && u2.power < 1001) {
+                u2.power += 2;
+            }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Keys.ENTER)) {
+            fireProjectile();
+            collision();
+        }
+
         if (Gdx.input.isKeyPressed(Keys.ESCAPE)) {
             Gdx.app.exit();
         }
 
-        tank1Body.setLinearVelocity(new Vector2(fx1*speedFactor, tank1Body.getLinearVelocity().y));
+        if (projectile != null) {
+            projectile.projectileSprite.setPosition(projectile.projectileBody.getPosition().x*PPM, projectile.projectileBody.getPosition().y*PPM);
+            projectile.projectileSprite.setRotation((float)Math.atan(projectile.projectileBody.getLinearVelocity().y/projectile.projectileBody.getLinearVelocity().x) * 180/(float)Math.PI);
+        }
+
+        u1.tankBody.setLinearVelocity(new Vector2(fx1*speedFactor, u1.tankBody.getLinearVelocity().y));
         tank2Body.setLinearVelocity(new Vector2(fx2*speedFactor, tank2Body.getLinearVelocity().y));
         tank1TurretSprite.setRotation(rx1);
         tank2TurretSprite.setRotation(rx2);
 
-        fuel1Sprite.setScale(fuel1, fuel1Sprite.getScaleY());
-        fuel2Sprite.setScale(fuel2, fuel2Sprite.getScaleY());
-        tank1Body.setLinearVelocity(new Vector2(fx1*speedFactor, tank1Body.getLinearVelocity().y));
+        u1.fuelSprite.setScale(u1.fuel, u1.fuelSprite.getScaleY());
+        u2.fuelSprite.setScale(u2.fuel, u2.fuelSprite.getScaleY());
 
-        projectile.projectileSprite.setPosition(projectile.projectileBody.getPosition().x, projectile.projectileBody.getPosition().y);
-        projectile.projectileSprite.setRotation((float)Math.atan(projectile.projectileBody.getLinearVelocity().y/projectile.projectileBody.getLinearVelocity().x) * 180/(float)Math.PI);
+        u1.powerSprite.setScale((float) u1.power/1000, 1);
+        u2.powerSprite.setScale((float) u2.power/1000, 1);
+
+        u1.tankBody.setLinearVelocity(new Vector2(fx1*speedFactor, u1.tankBody.getLinearVelocity().y));
     }
 
 
@@ -466,12 +566,17 @@ public class GameScreen implements Screen {
         update(delta);
         ScreenUtils.clear(0, 0, 0.2f, 1);
         game.batch.setProjectionMatrix(camera.combined);
-        debugRenderer.render(world, camera.combined.scl(PPM));
+
 
         TextureRegion currentFrame = explosionAnimation.getKeyFrame(stateTime, false);;
         if (animation) {
             stateTime += Gdx.graphics.getDeltaTime();
-            currentFrame = explosionAnimation.getKeyFrame(stateTime, true);
+            currentFrame = explosionAnimation.getKeyFrame(stateTime, false);
+            if (explosionAnimation.isAnimationFinished(stateTime)) {
+                stateTime = 0;
+                animation = false;
+                world.destroyBody(projectile.projectileBody);
+            }
         }
 
         game.batch.begin();
@@ -488,17 +593,59 @@ public class GameScreen implements Screen {
         tank1TurretSprite.draw(game.batch);
         tank2LowerSprite.draw(game.batch);
         tank2TurretSprite.draw(game.batch);
+        if (projectile != null) {
+            projectile.projectileSprite.draw(game.batch);
+            if (animation) game.batch.draw(currentFrame, projectile.projectileSprite.getX()-60, projectile.projectileSprite.getY()-50);
+        }
         groundSprite.draw(game.batch);
         fuel1Sprite.draw(game.batch);
         fuel2Sprite.draw(game.batch);
-        projectile.projectileSprite.draw(game.batch);
         hpBar.draw(game.batch);
         hp1.draw(game.batch);
         hp2.draw(game.batch);
-        if (animation) game.batch.draw(currentFrame, projectile.projectileSprite.getX(), projectile.projectileSprite.getY());
         pauseButton.draw(game.batch);
+        power1Sprite.draw(game.batch);
+        power2Sprite.draw(game.batch);
         game.batch.end();
 
+        debugRenderer.render(world, camera.combined.scl(PPM));
+
+    }
+
+    public void serialize() throws IOException {
+        ObjectOutputStream savedGames = null;
+        Scanner scan = null;
+        Writer wr = null;
+        FileInputStream numberGamesIn = null;
+
+        try {
+            numberGamesIn = new FileInputStream("number.txt");
+            wr = new FileWriter("number.txt");
+            scan = new Scanner(numberGamesIn);
+            int num = scan.nextInt();
+            if (num == 0) {
+                savedGames = new ObjectOutputStream(new FileOutputStream("file1.txt"));
+                wr.write(1);
+            }
+            else if (num == 1){
+                savedGames = new ObjectOutputStream(new FileOutputStream("file2.txt"));
+                wr.write(2);
+            }
+            else if (num == 2) {
+                savedGames = new ObjectOutputStream(new FileOutputStream("file3.txt"));
+                wr.write(3);
+            }
+            else {
+                savedGames = new ObjectOutputStream(new FileOutputStream("file1.txt"));
+                wr.write(3);
+            }
+        }
+        finally {
+            savedGames.writeObject(this);
+            savedGames.close();
+            wr.close();
+            numberGamesIn.close();
+        }
     }
 
     public void resize(int width, int height) {
